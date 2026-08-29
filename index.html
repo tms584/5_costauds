@@ -314,14 +314,21 @@
     { name: "Rowing bûcheron", reps: 13, weight: 13.6, sets: 3, rest: 90 },
   ];
   const DEFAULT_SUPERSET = {
-    rounds: 3,
-    rest: 90,
-    a: { name: "Curl haltère", reps: 13, weight: 13.6 },
-    b: { name: "Extension haltère", reps: 13, weight: 13.6 },
-  };
+  rounds: 3,
+  rest: 90,
+  a: { name: "Curl haltère", reps: 13, weight: 13.6 },
+  b: { name: "Extension haltère", reps: 13, weight: 13.6 },
+};
 
-  let EXO = clone(DEFAULT_EXO);
-  let SUPERSET = clone(DEFAULT_SUPERSET);
+const EXERCISE_VIDEOS = {
+  "Squats haltères": "https://youtu.be/K2eS6QjK1-w",
+  "SDT haltères": "https://youtu.be/QzpzuZu9JaA",
+  "Développé couché haltères": "https://youtu.be/3ckOOdyskXQ",
+  "Rowing bûcheron": "https://youtu.be/zK_rElx-lg8"
+};
+
+let EXO = clone(DEFAULT_EXO);
+let SUPERSET = clone(DEFAULT_SUPERSET);
 
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
   function formatTime(s) {
@@ -848,7 +855,16 @@
             <div class="statBox"><div class="statValue">${step.weight} kg</div><div class="statLabel">poids total</div></div>
           </div>
           <div class="weightHint">soit ${step.weight / 2} kg par haltère si tu en utilises deux</div>
-          <button class="btn pillBtn" id="done-set-btn">✓ série terminée</button>
+          ${EXERCISE_VIDEOS[step.name]
+  ? `<button class="btn pillBtn" onclick="window.open('${EXERCISE_VIDEOS[step.name]}','_blank')">▶ Voir la vidéo</button>`
+  : ""}
+
+<button
+  class="btn pillBtn"
+  id="done-set-btn"
+  style="margin-top:12px;">
+  ✓ série terminée
+</button>
         </div>`;
       document.getElementById("done-set-btn").onclick = next;
     } else if (step.type === "rest") {
