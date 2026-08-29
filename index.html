@@ -854,6 +854,8 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
       ratings,
       totalTimer: null,
       restTimer: null,
+      totalLastTimestamp: null,
+      restLastTimestamp: null,
     };
     renderSeance();
   }
@@ -944,7 +946,7 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
   });
 
   /* ---------------- Pyramide / FatBurner 6 : chrono libre + liste d'exercices ---------------- */
-  let pyramideChrono = { seconds: 0, running: false, timer: null, levelTimes: [], lastMark: 0, started: false };
+  let pyramideChrono = { seconds: 0, running: false, timer: null, levelTimes: [], lastMark: 0, started: false, lastTimestamp: null };
   let pyramidHistoryRecorded = false;
 
   const PYRAMIDE_LEVELS = [1,2,3,4,5,6,7,8,9,10,9,8,7,6,5,4,3,2,1];
@@ -1033,15 +1035,26 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
 
   function togglePyramideChrono() {
     if (!pyramideChrono.started) pyramideChrono.started = true;
+    const wasRunning = pyramideChrono.running;
     pyramideChrono.running = !pyramideChrono.running;
     if (pyramideChrono.running) {
+      pyramideChrono.lastTimestamp = performance.now();
       pyramideChrono.timer = setInterval(() => {
-        pyramideChrono.seconds += 1;
-        updateChronoDisplay();
-      }, 1000);
+        const now = performance.now();
+        const delta = Math.max(0, (now - (pyramideChrono.lastTimestamp || now)) / 1000);
+        if (delta > 0) {
+          pyramideChrono.seconds += delta;
+          pyramideChrono.lastTimestamp = now;
+          updateChronoDisplay();
+        }
+      }, 250);
     } else {
       clearInterval(pyramideChrono.timer);
       pyramideChrono.timer = null;
+      pyramideChrono.lastTimestamp = null;
+      if (wasRunning) {
+        pyramideChrono.lastMark = pyramideChrono.seconds;
+      }
     }
     updatePyramideChronoButton();
     updateLevelDisplay();
@@ -1074,6 +1087,7 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
     pyramideChrono.running = false;
     pyramideChrono.lastMark = 0;
     pyramideChrono.started = false;
+    pyramideChrono.lastTimestamp = null;
     pyramideChrono.levelTimes = Array(currentPyramidConfig.levels.length).fill(0);
     pyramideLevelIdx = 0;
     clearInterval(pyramideChrono.timer);
@@ -1169,35 +1183,49 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
 
   function startTotalTimer() {
     if (state.totalTimer) clearInterval(state.totalTimer);
+    state.totalLastTimestamp = performance.now();
     state.totalTimer = setInterval(() => {
       const step = STEPS[state.i];
       if (!state.started || !state.running || step.type === "done") return;
-      state.totalElapsed += 1;
-      if (step.type === "work") state.workElapsed += 1; else state.restElapsed += 1;
+      const now = performance.now();
+      const delta = Math.max(0, (now - (state.totalLastTimestamp || now)) / 1000);
+      if (delta <= 0) return;
+      state.totalElapsed += delta;
+      state.totalLastTimestamp = now;
+      if (step.type === "work") state.workElapsed += delta; else state.restElapsed += delta;
       const b = BLOCK_OF_STEP[state.i];
-      if (b != null) state.blockElapsed[b] += 1;
+      if (b != null) state.blockElapsed[b] += delta;
       renderTopBar();
       renderProgressBar();
-    }, 1000);
+    }, 250);
   }
 
   function startRestTimerIfNeeded() {
     if (state.restTimer) clearInterval(state.restTimer);
     const step = STEPS[state.i];
     if (state.running && step.type === "rest" && !step.noTimer) {
+      state.restLastTimestamp = performance.now();
       state.restTimer = setInterval(() => {
         if (!state.running) return;
-        state.secondsLeft -= 1;
-        if (state.secondsLeft <= 5) playCountdownBeep(state.secondsLeft);
+        const now = performance.now();
+        const delta = Math.max(0, (now - (state.restLastTimestamp || now)) / 1000);
+        if (delta <= 0) return;
+        state.restLastTimestamp = now;
+        state.secondsLeft -= delta;
+        if (state.secondsLeft <= 5) playCountdownBeep(Math.ceil(state.secondsLeft));
         if (state.secondsLeft <= 0) {
           clearInterval(state.restTimer);
+          state.restTimer = null;
+          state.restLastTimestamp = null;
           state.running = false;
           renderSeance();
           setTimeout(() => next(), 400);
           return;
         }
         renderRestRing();
-      }, 1000);
+      }, 250);
+    } else {
+      state.restLastTimestamp = null;
     }
   }
 
@@ -1208,7 +1236,14 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
     if (shouldStart) {
       state.timerStarted = true;
       state.sessionStartedAt = new Date().toISOString();
+      state.totalLastTimestamp = performance.now();
       startTotalTimer();
+    } else {
+      if (state.totalTimer) {
+        clearInterval(state.totalTimer);
+        state.totalTimer = null;
+      }
+      state.totalLastTimestamp = null;
     }
     startRestTimerIfNeeded();
     renderSeance();
