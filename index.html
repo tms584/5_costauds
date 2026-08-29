@@ -134,9 +134,9 @@
   .pyChronoBox .pillBtn { padding:11px 28px; font-size:13.5px; }
   .pyExoList { display:flex; flex-direction:column; gap:12px; margin-bottom:22px; }
   .pyExoCard { display:flex; gap:12px; background:#0F1010; border:1px solid #202020; border-radius:12px; padding:12px; align-items:flex-start; }
-  .pyExoImg { width:84px; height:84px; object-fit:cover; border-radius:8px; background:#fff; flex-shrink:0; }
+  .pyExoImg { width:84px; height:84px; object-fit:contain; object-position:center; border-radius:8px; background:#f4f4f4; flex-shrink:0; }
   .pyExoImgStack { display:flex; flex-direction:column; gap:4px; flex-shrink:0; }
-  .pyExoImg--stacked { width:84px; height:auto; object-fit:contain; }
+  .pyExoImg--stacked { width:84px; height:84px; object-fit:contain; object-position:center; }
   .pyExoBody { display:flex; flex-direction:column; gap:4px; min-width:0; }
   .pyExoName { font-size:14px; font-weight:700; color:#39FF6A; text-transform:uppercase; letter-spacing:0.02em; }
   .pyExoDesc { font-size:12px; line-height:1.45; color:#B9B9B4; }
@@ -697,12 +697,22 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
   let pyramideChrono = { seconds: 0, running: false, timer: null, levelTimes: [], lastMark: 0 };
 
   const PYRAMIDE_LEVELS = [1,2,3,4,5,6,7,8,9,10,9,8,7,6,5,4,3,2,1];
+  const FATBURNER6_LEVELS = [5,6,7,8,9,10,9,8,7,6,5];
   let pyramideLevelIdx = 0;
+  let currentPyramidConfig = {
+    levels: PYRAMIDE_LEVELS,
+    exos: [],
+    title: "Pyramide",
+    doneTitle: "Pyramide terminée",
+    subtitle: "5 exercices en pyramide du niveau 1 au 10"
+  };
   pyramideChrono.levelTimes = Array(PYRAMIDE_LEVELS.length).fill(0);
 
   function updateLevelDisplay() {
-    const level = PYRAMIDE_LEVELS[pyramideLevelIdx];
-    const phase = pyramideLevelIdx <= 9 ? "montée" : "descente";
+    const levels = currentPyramidConfig.levels.length ? currentPyramidConfig.levels : PYRAMIDE_LEVELS;
+    const level = levels[pyramideLevelIdx];
+    const midIndex = Math.floor((levels.length - 1) / 2);
+    const phase = pyramideLevelIdx <= midIndex ? "montée" : "descente";
     const valueEl = document.getElementById("pyramide-level-value");
     const phaseEl = document.getElementById("pyramide-level-phase");
     const countEl = document.getElementById("pyramide-level-count");
@@ -710,19 +720,20 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
     const nextBtn = document.getElementById("pyramide-level-next");
     if (valueEl) valueEl.textContent = level;
     if (phaseEl) phaseEl.textContent = phase;
-    if (countEl) countEl.textContent = `Série ${pyramideLevelIdx + 1} / ${PYRAMIDE_LEVELS.length}`;
+    if (countEl) countEl.textContent = `Série ${pyramideLevelIdx + 1} / ${levels.length}`;
     if (prevBtn) prevBtn.disabled = pyramideLevelIdx === 0;
     if (nextBtn) {
-      const isLast = pyramideLevelIdx === PYRAMIDE_LEVELS.length - 1;
+      const isLast = pyramideLevelIdx === levels.length - 1;
       nextBtn.textContent = isLast ? "✓ terminer" : "niveau suivant ▸";
-nextBtn.disabled = false;
+      nextBtn.disabled = false;
     }
   }
 
   function nextPyramideLevel() {
     pyramideChrono.levelTimes[pyramideLevelIdx] = pyramideChrono.seconds - pyramideChrono.lastMark;
     pyramideChrono.lastMark = pyramideChrono.seconds;
-    if (pyramideLevelIdx < PYRAMIDE_LEVELS.length - 1) {
+    const levels = currentPyramidConfig.levels.length ? currentPyramidConfig.levels : PYRAMIDE_LEVELS;
+    if (pyramideLevelIdx < levels.length - 1) {
       pyramideLevelIdx += 1;
       updateLevelDisplay();
     } else {
@@ -765,9 +776,13 @@ nextBtn.disabled = false;
 
   function renderPyramideDone() {
     const total = formatChrono(pyramideChrono.seconds);
-    const rows = PYRAMIDE_LEVELS.map((lvl,i)=>`<div class="recapRow ${i%2?'stripe':''}"><span>Niveau ${lvl}</span><span></span><span class="recapValue">${formatChrono(pyramideChrono.levelTimes[i]||0)}</span></div>`).join('');
-    cardEl.innerHTML = `<div class="doneWrap"><div class="doneTitle">Pyramide terminée</div><div class="recapBox"><div class="recapTotalRow"><div class="recapTotalLabel">Temps total</div><div class="recapTotalValue">${total}</div></div><div class="recapDivider"></div><div class="recapTable">${rows}</div></div><button class="btn restartBtn" id="pyramide-restart">↺ Recommencer</button></div>`;
-    document.getElementById('pyramide-restart').onclick=()=>{pyramideChrono={seconds:0,running:false,timer:null,levelTimes:Array(PYRAMIDE_LEVELS.length).fill(0),lastMark:0};pyramideLevelIdx=0;renderSeance();};
+    const rows = currentPyramidConfig.levels.map((lvl,i)=>`<div class="recapRow ${i%2?'stripe':''}"><span>Niveau ${lvl}</span><span></span><span class="recapValue">${formatChrono(pyramideChrono.levelTimes[i]||0)}</span></div>`).join('');
+    cardEl.innerHTML = `<div class="doneWrap"><div class="doneTitle">${currentPyramidConfig.doneTitle}</div><div class="recapBox"><div class="recapTotalRow"><div class="recapTotalLabel">Temps total</div><div class="recapTotalValue">${total}</div></div><div class="recapDivider"></div><div class="recapTable">${rows}</div></div><button class="btn restartBtn" id="pyramide-restart">↺ Recommencer</button></div>`;
+    document.getElementById('pyramide-restart').onclick = () => {
+      pyramideChrono = { seconds: 0, running: false, timer: null, levelTimes: Array(currentPyramidConfig.levels.length).fill(0), lastMark: 0 };
+      pyramideLevelIdx = 0;
+      renderPyramidWorkout(currentPyramidConfig);
+    };
   }
 
   function endPyramide() {
@@ -777,8 +792,17 @@ nextBtn.disabled = false;
     renderPyramideDone();
   }
 
-  function renderPyramide(title, subtitle) {
-    const exosHtml = PYRAMIDE_EXOS.map((ex) => {
+  function renderPyramidWorkout(config) {
+    currentPyramidConfig = { ...config, levels: [...config.levels], exos: config.exos };
+    pyramideChrono.seconds = 0;
+    pyramideChrono.running = false;
+    pyramideChrono.lastMark = 0;
+    pyramideChrono.levelTimes = Array(currentPyramidConfig.levels.length).fill(0);
+    pyramideLevelIdx = 0;
+    clearInterval(pyramideChrono.timer);
+    pyramideChrono.timer = null;
+
+    const exosHtml = currentPyramidConfig.exos.map((ex) => {
       const imgsHtml = ex.imgs
         ? `<div class="pyExoImgStack">${ex.imgs.map((src) => `<img class="pyExoImg pyExoImg--stacked" src="${src}" alt="${ex.name}" />`).join("")}</div>`
         : `<img class="pyExoImg" src="${ex.img}" alt="${ex.name}" />`;
@@ -795,8 +819,8 @@ nextBtn.disabled = false;
     cardEl.innerHTML = `
       <div class="pyWrap">
         <div class="pyHeader">
-          <div class="pyTitle">${title}</div>
-          <div class="pySub">${subtitle}</div>
+          <div class="pyTitle">${config.title}</div>
+          <div class="pySub">${config.subtitle}</div>
         </div>
         <div class="pyLevelBox">
           <div class="pyLevelCount" id="pyramide-level-count"></div>
@@ -821,6 +845,26 @@ nextBtn.disabled = false;
     document.getElementById("pyramide-level-next").onclick = nextPyramideLevel;
     document.getElementById("pyramide-level-prev").onclick = prevPyramideLevel;
     updateLevelDisplay();
+  }
+
+  function renderPyramide(title, subtitle) {
+    renderPyramidWorkout({
+      title,
+      subtitle,
+      levels: PYRAMIDE_LEVELS,
+      exos: PYRAMIDE_EXOS,
+      doneTitle: "Pyramide terminée"
+    });
+  }
+
+  function renderFatBurner6() {
+    renderPyramidWorkout({
+      title: "FatBurner 6",
+      subtitle: "6 exercices en pyramide du niveau 5 au 10",
+      levels: FATBURNER6_LEVELS,
+      exos: FATBURNER6_EXOS,
+      doneTitle: "FatBurner 6 terminée"
+    });
   }
 
   function goTo(idx) {
@@ -929,6 +973,153 @@ nextBtn.disabled = false;
     },
   ];
 
+  const FATBURNER6_EXOS = [
+    {
+      num: 1,
+      name: 'Swing',
+      desc: 'Engager les fessiers, contraction puissante pour envoyer les bras jusqu\'au niveau du visage, il ne s\'agit pas d\'une élévation frontale, les bras travaillent bien moins que les fessiers.',
+      img: PYRAMIDE_EXOS[0].img
+    },
+    {
+      num: 2,
+      name: 'Squat',
+      desc: 'Poids sur les épaules, ne pas se pencher en avant, buste redressé. L\'amplitude va s\'améliorer avec le temps (raideur cheville, bassin). Si trop dur, faire un squat, sans poids, avec les bras tendus devant pour l\'équilibre.',
+      img: PYRAMIDE_EXOS[1].img
+    },
+    {
+      num: 3,
+      name: 'Soulevé de terre',
+      desc: 'Prendre les haltères au sol avec un dos neutre, garder la sangle abdominale engagée, puis pousser sur les jambes pour redresser le corps. Les hanches doivent se fermer et le buste se redresser sans cambrer le dos.',
+      img: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="800" height="800" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Deadlift illustration">
+          <rect width="800" height="800" fill="#f3f3f3"/>
+          <g transform="translate(80 20)">
+            <path d="M125 200 Q180 110 250 100 L345 90 L405 120 L430 200 L398 250 L338 310 L353 510 L285 610 L240 610 L205 470 L170 330 L145 270 Z" fill="#f4f4f4"/>
+            <path d="M278 290 L345 215 L415 280 L355 330 L328 400 L298 500 L262 614 L197 610 L198 438 L226 365 Z" fill="#f7f7f7"/>
+            <path d="M408 178 L460 160 L499 188 L520 270 L472 305 L430 285 L390 220 Z" fill="#efefef"/>
+            <path d="M240 190 L302 128 L328 92 L365 109 L337 172 L275 200 Z" fill="#3f2c28"/>
+            <path d="M340 110 L420 128 L438 182 L356 207 L311 163 Z" fill="#4b352d"/>
+            <path d="M318 175 Q350 148 370 168 L385 212 L350 228 L314 205 Z" fill="#e8d0b8"/>
+            <path d="M305 215 L386 204 L495 250 L518 325 L480 350 L366 330 L305 290 Z" fill="#f5f5f5"/>
+            <path d="M230 320 L140 210 L112 305 L150 395 L210 420 Z" fill="#f7f7f7"/>
+            <path d="M228 330 L182 514 L151 610 L78 610 L124 462 L158 364 Z" fill="#f4f4f4"/>
+            <path d="M236 329 L308 405 L350 610 L285 610 L230 510 L185 390 Z" fill="#f7f7f7"/>
+            <path d="M345 330 L496 412 L550 610 L470 610 L415 470 L361 400 Z" fill="#f7f7f7"/>
+            <path d="M226 445 L150 468 L122 612 L198 612 L235 528 Z" fill="#e8e8e8"/>
+            <path d="M346 444 L430 466 L456 610 L374 610 L344 514 Z" fill="#ebebeb"/>
+            <path d="M108 600 L170 600 L180 612 L100 612 Z" fill="#1d1d1d"/>
+            <path d="M286 600 L360 600 L370 612 L285 612 Z" fill="#1d1d1d"/>
+            <path d="M470 600 L545 600 L560 612 L462 612 Z" fill="#1d1d1d"/>
+            <path d="M110 252 L125 300 L192 320 L204 270 L165 210 Z" fill="#7d7d7d"/>
+            <path d="M430 275 L448 312 L520 310 L534 263 L495 225 Z" fill="#7d7d7d"/>
+            <path d="M445 330 L545 395 L540 418 L440 346 Z" fill="#7d7d7d"/>
+            <path d="M120 305 L182 334 L184 360 L116 336 Z" fill="#7d7d7d"/>
+            <path d="M275 300 L355 310 L345 347 L266 343 Z" fill="#7d7d7d"/>
+            <path d="M318 350 L420 370 L412 408 L305 390 Z" fill="#7d7d7d"/>
+            <path d="M245 535 L302 565 L284 620 L220 620 Z" fill="#202020"/>
+            <path d="M360 525 L430 557 L430 620 L360 620 Z" fill="#202020"/>
+            <path d="M393 150 Q446 110 495 140 L514 158 L478 184 L430 172 Z" fill="#f1f1f1"/>
+            <path d="M342 205 L370 220 L405 170 L440 175 L426 226 L378 245 Z" fill="#f0f0f0"/>
+            <path d="M330 175 L370 168 L420 180 L432 212 L385 233 L326 214 Z" fill="#e8d0b8"/>
+            <path d="M177 314 L203 328 L190 363 L154 352 Z" fill="#efefef"/>
+            <path d="M244 548 L283 561 L277 602 L236 592 Z" fill="#0f0f0f"/>
+            <path d="M370 547 L417 560 L414 600 L368 593 Z" fill="#0f0f0f"/>
+            <path d="M210 450 L255 462 L243 518 L196 507 Z" fill="#d4d4d4"/>
+            <path d="M350 436 L390 447 L394 504 L348 495 Z" fill="#d2d2d2"/>
+            <path d="M248 176 L282 165 L297 196 L267 231 L223 202 Z" fill="#5d382d"/>
+            <path d="M463 150 L510 160 L532 192 L503 220 L454 195 Z" fill="#5b382d"/>
+            <path d="M95 186 L152 180 L171 244 L105 250 Z" fill="#f9f9f9"/>
+            <path d="M501 248 L560 236 L575 295 L518 318 Z" fill="#f9f9f9"/>
+            <path d="M236 182 L287 160 L291 206 L246 210 Z" fill="#f5d2b4"/>
+            <path d="M356 164 L403 170 L405 212 L362 217 Z" fill="#f5d2b4"/>
+            <circle cx="302" cy="127" r="20" fill="#f0d0b1"/>
+            <circle cx="297" cy="120" r="5" fill="#1b1b1b"/>
+            <path d="M314 150 L334 170 L322 180 L305 162 Z" fill="#2e1d16"/>
+            <path d="M294 126 Q323 118 346 130 L332 146 L292 145 Z" fill="#4f352d"/>
+            <path d="M240 162 L280 147 L315 182 L271 201 Z" fill="#2b211f"/>
+            <path d="M348 180 L431 198 L456 246 L344 238 Z" fill="#efefef"/>
+            <path d="M120 230 L185 220 L185 273 L122 284 Z" fill="#d6d6d6"/>
+            <path d="M452 252 L520 244 L527 298 L455 310 Z" fill="#d6d6d6"/>
+          </g>
+        </svg>
+      `)
+    },
+    {
+      num: 4,
+      name: 'Curl to press',
+      desc: 'Commencer par un curl contrôlé, puis pousser les haltères au-dessus de la tête en gardant les coudes bien en avant. Le mouvement se termine sans cambrer le bas du dos.',
+      img: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="800" height="800" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Curl to press illustration">
+          <rect width="800" height="800" fill="#f3f3f3"/>
+          <g transform="translate(60 32)">
+            <path d="M145 172 L222 112 L296 135 L315 196 L285 268 L210 307 L150 261 Z" fill="#f9f9f9"/>
+            <path d="M310 164 L388 118 L458 140 L478 205 L456 274 L384 308 L314 264 Z" fill="#f9f9f9"/>
+            <path d="M286 277 L354 256 L422 272 L453 346 L411 423 L324 415 L285 344 Z" fill="#f8f8f8"/>
+            <path d="M162 307 L223 271 L273 323 L250 411 L197 454 L150 409 Z" fill="#f7f7f7"/>
+            <path d="M437 308 L484 281 L545 320 L550 407 L497 454 L449 415 Z" fill="#f7f7f7"/>
+            <path d="M222 425 L270 407 L310 456 L275 600 L200 610 L175 469 Z" fill="#f3f3f3"/>
+            <path d="M310 426 L362 408 L419 447 L448 610 L356 610 L312 503 Z" fill="#f3f3f3"/>
+            <path d="M275 610 L320 610 L338 654 L252 654 Z" fill="#202020"/>
+            <path d="M356 610 L458 610 L470 655 L351 655 Z" fill="#202020"/>
+            <path d="M175 130 L245 105 L286 137 L250 205 L179 202 Z" fill="#4b2f27"/>
+            <path d="M380 122 L452 139 L467 206 L403 220 L350 174 Z" fill="#4b2f27"/>
+            <path d="M243 226 L298 208 L350 228 L356 293 L295 316 L231 290 Z" fill="#f0d2b5"/>
+            <path d="M334 226 L406 233 L451 290 L401 321 L338 296 Z" fill="#f0d2b5"/>
+            <circle cx="271" cy="132" r="18" fill="#e7c8a3"/>
+            <circle cx="423" cy="125" r="18" fill="#e7c8a3"/>
+            <path d="M230 233 L280 241 L286 260 L240 281 L208 256 Z" fill="#f0d2b5"/>
+            <path d="M388 236 L440 246 L455 271 L402 290 L362 263 Z" fill="#f0d2b5"/>
+            <path d="M190 316 L239 294 L251 329 L229 380 L187 363 Z" fill="#d9d9d9"/>
+            <path d="M387 309 L440 318 L454 365 L406 389 L363 358 Z" fill="#d9d9d9"/>
+            <path d="M163 322 L144 430 L180 525 L214 520 L213 432 Z" fill="#f1f1f1"/>
+            <path d="M458 325 L544 345 L566 445 L496 517 L448 474 Z" fill="#f1f1f1"/>
+            <path d="M196 431 L270 405 L302 504 L228 559 L177 501 Z" fill="#f8f8f8"/>
+            <path d="M325 446 L392 420 L450 474 L422 602 L335 594 L314 511 Z" fill="#f8f8f8"/>
+            <path d="M153 538 L217 533 L230 606 L159 606 Z" fill="#202020"/>
+            <path d="M480 552 L550 548 L560 606 L485 606 Z" fill="#202020"/>
+            <path d="M219 101 L170 77 L133 90 L104 130 L125 170 L184 170 Z" fill="#f5f5f5"/>
+            <path d="M457 97 L515 77 L551 99 L575 138 L552 178 L487 175 Z" fill="#f5f5f5"/>
+            <path d="M275 108 L316 120 L328 142 L286 160 L259 144 Z" fill="#5a3d32"/>
+            <path d="M370 119 L399 117 L424 141 L402 160 L349 155 Z" fill="#5a3d32"/>
+            <circle cx="237" cy="111" r="7" fill="#1a1a1a"/>
+            <circle cx="433" cy="109" r="7" fill="#1a1a1a"/>
+            <path d="M228 160 L275 148 L298 175 L257 201 L210 180 Z" fill="#e9d2b8"/>
+            <path d="M388 160 L432 162 L450 189 L410 208 L368 184 Z" fill="#e9d2b8"/>
+            <path d="M118 155 L162 165 L174 219 L116 235 L98 188 Z" fill="#d4d4d4"/>
+            <path d="M531 160 L579 167 L586 223 L529 238 L510 182 Z" fill="#d4d4d4"/>
+            <path d="M225 322 L266 338 L252 383 L209 389 L184 351 Z" fill="#2b5fa9"/>
+            <path d="M396 330 L442 332 L460 390 L420 404 L373 366 Z" fill="#2b5fa9"/>
+            <path d="M253 385 L305 370 L340 402 L318 467 L262 455 Z" fill="#2d6bc4"/>
+            <path d="M323 384 L409 384 L428 450 L360 472 L300 451 Z" fill="#2c6dc4"/>
+            <path d="M176 459 L212 503 L200 609 L153 606 L143 493 Z" fill="#1b1b1b"/>
+            <path d="M454 456 L497 483 L495 607 L447 606 L443 500 Z" fill="#1b1b1b"/>
+            <path d="M309 163 L300 259 L335 262 L350 167 Z" fill="#f0d1b5"/>
+            <path d="M313 170 L352 170 L355 210 L314 212 Z" fill="#e6c9a4"/>
+            <path d="M253 268 L294 278 L312 309 L266 331 L234 305 Z" fill="#e8d8c7"/>
+            <path d="M363 268 L414 280 L428 312 L385 341 L343 318 Z" fill="#e8d8c7"/>
+            <path d="M218 138 L250 123 L274 200 L241 210 Z" fill="#f1d0af"/>
+            <path d="M394 136 L428 149 L436 200 L401 208 Z" fill="#f1d0af"/>
+          </g>
+        </svg>
+      `)
+    },
+    {
+      num: 5,
+      name: 'Tirage planche + pompes',
+      desc: 'En position de planche, tirer un haltère ou une main au sol pour stabiliser le tronc, puis enchaîner une pompe sans perdre l\'alignement du corps. Garder les abdos engagés pour protéger le bas du dos.',
+      imgs: [
+        'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=900&q=80',
+        'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&w=900&q=80'
+      ]
+    },
+    {
+      num: 6,
+      name: 'Relevé de jambes',
+      desc: 'Allonge-toi sur le dos, lève les jambes en gardant les bras tendus au-dessus de la tête avec les haltères. Remonte les jambes sans cambrer le bas du dos et contrôle la descente.',
+      img: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=900&q=80'
+    }
+  ];
+
   /* ---------------- rendu ---------------- */
   const cardEl = document.getElementById("seance-card");
 
@@ -961,7 +1152,7 @@ nextBtn.disabled = false;
         renderPyramide("Pyramide", "5 exercices en pyramide du niveau 1 au 10");
       };
       document.getElementById("start-fatburner6-btn").onclick = () => {
-        showToast("FatBurner 6 — bientôt disponible");
+        renderFatBurner6();
       };
       return;
     }
@@ -1063,7 +1254,7 @@ ${EXERCISE_VIDEOS[step.a.name]
        class="btn pillBtn"
        style="margin-bottom:12px;"
        onclick="window.open('${EXERCISE_VIDEOS[step.a.name]}','_blank','noopener,noreferrer')">
-       ▶ Voir la vidéo
+       ▶  voir la vidéo
      </button>`
   : ""}
           <div class="supersetHint">Enchaîne directement avec ${step.b.name}, sans pause</div>
@@ -1082,7 +1273,7 @@ ${EXERCISE_VIDEOS[step.b.name]
        class="btn pillBtn"
        style="margin-bottom:12px;"
        onclick="window.open('${EXERCISE_VIDEOS[step.b.name]}','_blank','noopener,noreferrer')">
-       ▶ Voir la vidéo
+       ▶  voir la vidéo
      </button>`
   : ""}
           <button class="btn pillBtn" id="done-set-btn">✓ manche terminée</button>
@@ -1099,7 +1290,7 @@ ${EXERCISE_VIDEOS[step.b.name]
           </div>
           <div class="weightHint">soit ${step.weight / 2} kg par haltère si tu en utilises deux</div>
           ${EXERCISE_VIDEOS[step.name]
-  ? `<button class="btn pillBtn" onclick="window.open('${EXERCISE_VIDEOS[step.name]}','_blank')">▶ Voir la vidéo</button>`
+  ? `<button class="btn pillBtn" onclick="window.open('${EXERCISE_VIDEOS[step.name]}','_blank')">▶ voir la vidéo</button>`
   : ""}
 
 <button
