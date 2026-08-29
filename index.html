@@ -179,6 +179,62 @@
   .ghostBtn { background:transparent; border:1px solid #2A2A2A; color:#B9B9B4; border-radius:999px; padding:13px 16px; font-size:13px; font-family:'Inter',sans-serif; cursor:pointer; }
   .toast { position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(20px); background:#39FF6A; color:#0B0D0E; font-size:13px; font-weight:700; padding:10px 20px; border-radius:999px; opacity:0; transition: opacity .25s ease, transform .25s ease; pointer-events:none; }
   .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+  .infoBtn {
+  margin: 0 auto 12px;
+  background: transparent;
+  border: 1px solid #2A2A2A;
+  color: #B9B9B4;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-family: 'Inter', sans-serif;
+}
+
+.helpModal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 9999;
+}
+
+.helpCard {
+  max-width: 340px;
+  width: 100%;
+  background: #131414;
+  border: 1px solid #2A2A2A;
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.helpTitle {
+  color: #39FF6A;
+  font-weight: 800;
+  margin-bottom: 14px;
+  text-transform: uppercase;
+  font-size: 13px;
+}
+
+.helpText {
+  color: #D8D8D2;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.helpClose {
+  margin-top: 16px;
+  width: 100%;
+  background: #39FF6A;
+  color: #0B0D0E;
+  border: none;
+  border-radius: 999px;
+  padding: 12px;
+  font-weight: 700;
+  font-family: 'Inter', sans-serif;
+}
 </style>
 </head>
 <body>
@@ -814,19 +870,37 @@
           </div>`}
           ${step.rating ? (step.dualRating ? `
           <div class="ratingBox">
-            <div class="ratingLabelText">note l'effort · ${step.ratingA}</div>
+            <div class="ratingLabelText">
+  note l'effort · ${step.ratingA}
+</div>
+
+<button class="btn infoBtn rating-help-btn">
+  ⓘ Échelle d'effort
+</button>
             <div class="ratingGrid" data-sub="a">
               ${ratingButtonsHtml(state.ratings[blockIdx].a)}
             </div>
           </div>
           <div class="ratingBox">
-            <div class="ratingLabelText">note l'effort · ${step.ratingB}</div>
+            <div class="ratingLabelText">
+  note l'effort · ${step.ratingB}
+</div>
+
+<button class="btn infoBtn rating-help-btn">
+  ⓘ Échelle d'effort
+</button>
             <div class="ratingGrid" data-sub="b">
               ${ratingButtonsHtml(state.ratings[blockIdx].b)}
             </div>
           </div>` : `
           <div class="ratingBox">
-            <div class="ratingLabelText">note l'effort · ${step.ratingLabel}</div>
+            <div class="ratingLabelText">
+  note l'effort · ${step.ratingLabel}
+</div>
+
+<button class="btn infoBtn rating-help-btn">
+  ⓘ Échelle d'effort
+</button>
             <div class="ratingGrid" data-sub="">
               ${ratingButtonsHtml(state.ratings[blockIdx])}
             </div>
@@ -847,6 +921,11 @@
               if (sub) state.ratings[blockIdx][sub] = val;
               else state.ratings[blockIdx] = val;
               renderStepBody();
+              document
+        .querySelectorAll(".rating-help-btn")
+        .forEach(btn => {
+          btn.onclick = showRatingHelp;
+        });
             };
           });
         });
@@ -1053,6 +1132,52 @@
   });
   document.getElementById("cfg-unlink-file").addEventListener("click", unlinkConfigFile);
 
+  function showRatingHelp() {
+  const modal = document.createElement("div");
+
+  modal.className = "helpModal";
+
+  modal.innerHTML = `
+    <div class="helpCard">
+      <div class="helpTitle">
+        Échelle d'effort
+      </div>
+
+      <div class="helpText">
+        <b>3</b> = Très facile, je peux faire beaucoup plus.
+        <br><br>
+
+        <b>5</b> = J'ai de la place pour faire 5 à 7 répétitions de plus.
+        <br><br>
+
+        <b>7</b> = J'ai de la place pour faire 3 à 4 répétitions de plus.
+        <br><br>
+
+        <b>8</b> = J'ai de la place pour faire 2 à 3 répétitions de plus.
+        <br><br>
+
+        <b>9</b> = Je peux faire 1 répétition de plus (mais pas plus).
+        <br><br>
+
+        <b>10</b> = Échec, je suis incapable de faire une répétition de plus.
+      </div>
+
+      <button class="helpClose">
+        Fermer
+      </button>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  modal.querySelector(".helpClose").onclick = () => {
+    modal.remove();
+  };
+
+  modal.onclick = (e) => {
+    if (e.target === modal) modal.remove();
+  };
+}
   /* ---------------- init ---------------- */
   (async function initConfig() {
     const fileLoaded = await tryAutoLoadFromFile();
