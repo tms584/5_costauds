@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>5 Costauds</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap');
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: #060708;
+    color: #F5F5F0;
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    width: 100%;
+  }
+  .app {
+    max-width: 480px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 18px 16px 40px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+  }
+  .tabs {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 6px;
+    background: #131414;
+    border: 1px solid #232323;
+    border-radius: 999px;
+    padding: 4px;
+    margin-bottom: 18px;
+  }
+  .tab-btn {
+    min-width: 0;
+    border: none;
+    background: transparent;
+    color: #8A8A85;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    padding: 10px 8px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background .15s ease, color .15s ease;
+  }
+  .tab-btn.active { background: #39FF6A; color: #0B0D0E; }
+
+  .panel { display: none; flex: 1; flex-direction: column; }
+  .panel.active { display: flex; }
+
+  .card {
+    background: #0B0D0E;
+    border: 1px solid #202020;
+    border-radius: 16px;
+    padding: 20px 20px 18px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 560px;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .btn { transition: transform .12s ease, opacity .12s ease; cursor: pointer; }
+  .btn:active { transform: scale(0.94); }
+  .pulse { animation: pulse 1.8s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .55; } }
+
+  /* ---------- top bar / progress (séance) ---------- */
+  .topBar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .brandRow { display: flex; align-items: center; gap: 8px; }
+  .brandText { font-size: 13px; font-weight: 600; letter-spacing: 0.04em; color: #B9B9B4; text-transform: uppercase; }
+  .topRight { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+  .globalTimer { display:flex; align-items:center; gap:4px; font-size:12px; color:#39FF6A; font-weight:700; font-variant-numeric: tabular-nums; }
+  .counter { font-size: 12px; color: #8A8A85; font-weight: 500; }
+
+  .topNavRow { display:flex; align-items:center; justify-content:space-between; margin-bottom: 14px; }
+  .topNavBtn { background:none; border:none; color:#B9B9B4; font-size:12.5px; font-weight:500; cursor:pointer; padding:6px 2px; font-family:'Inter',sans-serif; }
+  .topNavBtn:disabled { opacity: .35; cursor: default; }
+
+  .progressBarWrap { display:flex; gap:4px; margin-bottom:4px; }
+  .progressSegmentWrap { flex:1; display:flex; flex-direction:column; gap:4px; align-items:center; }
+  .progressSegment { width:100%; height:5px; border-radius:3px; background:#232323; }
+  .progressSegment.filled { background:#39FF6A; }
+  .progressTime { font-size:10px; font-weight:700; font-variant-numeric: tabular-nums; line-height:1; color:#9A9A94; }
+  .progressTime.current { color:#39FF6A; }
+  .progressSegLabel { font-size:9px; text-align:center; line-height:1.15; text-transform:uppercase; letter-spacing:0.02em; color:#6B6B66; }
+  .progressSegLabel.current, .progressSegLabel.done { color:#39FF6A; }
+  .progressSegLabel.current { font-weight:700; }
+  .upNext { font-size:11px; color:#8A8A85; text-align:center; margin-bottom:14px; letter-spacing:0.03em; }
+
+  /* ---------- start screen ---------- */
+  .startWrap { display:flex; flex-direction:column; align-items:center; justify-content:center; flex:1; text-align:center; gap:8px; padding:10px 6px; }
+  .startIconWrap { width:64px; height:64px; border-radius:50%; background:#161717; border:1px solid #232323; display:flex; align-items:center; justify-content:center; margin-bottom:10px; font-size:26px; }
+  .startTitle { font-family:'Anton', sans-serif; font-size:28px; color:#F5F5F0; text-transform:uppercase; letter-spacing:0.01em; }
+  .startSub { font-size:13px; color:#B9B9B4; max-width:280px; line-height:1.5; }
+  .startHint { font-size:11.5px; color:#7A7A75; max-width:260px; line-height:1.5; margin-bottom:12px; }
+  .pillBtn { display:flex; align-items:center; gap:8px; background:#39FF6A; color:#0B0D0E; border:none; border-radius:999px; padding:14px 32px; font-size:15px; font-weight:700; font-family:'Inter',sans-serif; }
+
+  /* ---------- work screen ---------- */
+  .workWrap { display:flex; flex-direction:column; align-items:center; flex:1; justify-content:center; padding:10px 0; }
+  .supersetTag { font-size:11px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#0B0D0E; background:#FF6A3D; padding:4px 10px; border-radius:20px; margin-bottom:14px; }
+  .exoName { font-family:'Anton', sans-serif; font-size:32px; line-height:1.05; text-align:center; color:#39FF6A; margin-bottom:24px; text-transform:uppercase; letter-spacing:0.01em; }
+  .statRow { display:flex; gap:10px; margin-bottom:10px; }
+  .statBox { background:#161717; border:1px solid #232323; border-radius:10px; padding:12px 18px; text-align:center; min-width:80px; }
+  .statValue { font-size:22px; font-weight:800; font-variant-numeric: tabular-nums; }
+  .statLabel { font-size:10px; color:#8A8A85; text-transform:uppercase; letter-spacing:0.06em; margin-top:2px; }
+  .weightHint { font-size:12px; color:#8A8A85; margin-bottom:16px; }
+  .supersetHint { font-size:12.5px; color:#D8D8D2; background:#161717; border:1px solid #2A2A2A; border-radius:10px; padding:10px 14px; margin-bottom:20px; max-width:300px; text-align:center; line-height:1.4; }
+
+  /* ---------- rest screen ---------- */
+  .restWrap { display:flex; flex-direction:column; align-items:center; flex:1; justify-content:center; }
+  .restLabel { font-size:13px; color:#B9B9B4; text-transform:uppercase; letter-spacing:0.05em; font-weight:600; margin-bottom:16px; }
+  .ringWrap { position:relative; width:260px; height:260px; margin:1.5rem auto; }
+  .timerCenter { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:'Anton', sans-serif; font-size:52px; color:#F5F5F0; font-variant-numeric: tabular-nums; }
+  .restBtnRow { display:flex; flex-direction:column; align-items:center; gap:14px; }
+  .weightChangeNote { font-size:12px; color:#FF6A3D; background:#161717; border:1px solid #2A2A2A; border-radius:10px; padding:9px 14px; margin: 0 auto 32px; max-width:280px; text-align:center; line-height:1.4; }
+  .ratingBox { margin: 4px 0 20px; text-align:center; align-self:stretch; }
+  .ratingLabelText { font-size:11px; color:#B9B9B4; text-transform:uppercase; letter-spacing:0.05em; font-weight:600; margin-bottom:10px; }
+  .ratingGrid { display:flex; justify-content:center; gap:6px; flex-wrap:nowrap; width:100%; max-width:400px; margin:0 auto; }
+  .ratingBtn { flex:1 1 0; min-width:0; height:38px; border-radius:9px; border:2px solid transparent; color:#0B0D0E; font-family:'Inter',sans-serif; font-size:13.5px; font-weight:700; cursor:pointer; padding:0; transition: transform .12s ease, border-color .12s ease; }
+  .ratingBtn.selected { border-color:#F5F5F0; transform: scale(1.08); }
+  .circleBtn { width:58px; height:58px; border-radius:50%; background:#39FF6A; border:none; display:flex; align-items:center; justify-content:center; font-size:22px; }
+  .skipBtn { display:flex; align-items:center; gap:6px; background:transparent; border:1px solid #2A2A2A; color:#B9B9B4; border-radius:999px; padding:8px 16px; font-size:12.5px; font-family:'Inter',sans-serif; }
+
+  /* ---------- done screen ---------- */
+  .doneWrap { display:flex; flex-direction:column; align-items:center; justify-content:center; flex:1; text-align:center; gap:10px; }
+  .doneTitle { font-family:'Anton', sans-serif; font-size:30px; color:#39FF6A; text-transform:uppercase; }
+  .doneSub { font-size:13px; color:#B9B9B4; max-width:280px; line-height:1.5; margin-bottom:4px; }
+  .recapBox { background:#161717; border:1px solid #232323; border-radius:12px; padding:14px 14px; width:280px; max-width:100%; margin-bottom:8px; box-sizing:border-box; }
+  .recapTotalRow { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; padding:0 4px; }
+  .recapTotalLabel { display:flex; align-items:center; gap:5px; font-size:11.5px; color:#B9B9B4; text-transform:uppercase; letter-spacing:0.05em; font-weight:600; }
+  .recapTotalValue { font-family:'Anton', sans-serif; font-size:20px; color:#39FF6A; font-variant-numeric: tabular-nums; }
+  .recapDivider { height:1px; background:#232323; margin-bottom:4px; }
+  .recapTable { display:flex; flex-direction:column; border-radius:8px; overflow:hidden; margin-bottom:4px; }
+  .recapRow { display:grid; grid-template-columns: 1fr 44px 52px; column-gap:6px; align-items:center; padding:8px 8px; font-size:13px; color:#D8D8D2; text-align:left; }
+  .recapRow.stripe { background: rgba(255,255,255,0.045); }
+  .recapRow.sub { padding:5px 8px 5px 22px; font-size:11.5px; color:#9A9A94; }
+  .recapRow.sub .recapArrow { color:#5A5A56; margin-right:5px; }
+  .recapHeaderRow { color:#6B6B66; font-size:9.5px; text-transform:uppercase; letter-spacing:0.05em; font-weight:700; padding:0 8px 6px; }
+  .recapHeaderRow span:nth-child(2), .recapHeaderRow span:nth-child(3) { text-align:right; }
+  .recapValue { font-weight:700; font-variant-numeric: tabular-nums; color:#F5F5F0; text-align:right; white-space:nowrap; font-size:12.5px; }
+  .weightLabel { display:block; font-size:10.5px; color:#B9B9B4; text-transform:uppercase; letter-spacing:0.05em; font-weight:600; margin-bottom:8px; text-align:left; }
+  .weightInputRow { display:flex; align-items:center; gap:8px; margin-bottom:12px; }
+  .weightInput { flex:1; min-width:0; background:#0B0D0E; border:1px solid #2A2A2A; border-radius:8px; color:#F5F5F0; font-size:15px; font-weight:700; padding:9px 12px; font-variant-numeric: tabular-nums; outline:none; font-family:'Inter',sans-serif; box-sizing:border-box; }
+  .weightUnit { font-size:12px; color:#B9B9B4; font-weight:600; flex-shrink:0; }
+  .kcalRow { display:flex; align-items:center; justify-content:space-between; }
+  .kcalLabel { font-size:11.5px; color:#B9B9B4; text-transform:uppercase; letter-spacing:0.05em; font-weight:600; }
+  .kcalValue { font-family:'Anton', sans-serif; font-size:20px; color:#FF6A3D; font-variant-numeric: tabular-nums; }
+  .kcalNote { font-size:10.5px; color:#8A8A85; line-height:1.4; margin-top:6px; text-align:left; }
+  .restartBtn { display:flex; align-items:center; gap:8px; background:transparent; border:1px solid #2A2A2A; color:#F5F5F0; border-radius:999px; padding:10px 20px; font-size:13px; font-family:'Inter',sans-serif; }
+
+  .bottomBar { display:flex; justify-content:center; margin-top:16px; }
+  .pauseBtn { display:flex; align-items:center; gap:8px; color:#0B0D0E; border:none; border-radius:999px; padding:11px 26px; font-size:13.5px; font-weight:700; font-family:'Inter',sans-serif; }
+
+  /* ---------- configuration tab ---------- */
+  .cfgScroll { padding-left:0; padding-right:0; overflow-y:auto; }
+  .cfgInner { padding: 0 20px 0; }
+  .cfgTitle { font-family:'Anton', sans-serif; font-size:22px; color:#F5F5F0; text-transform:uppercase; margin: 2px 0 4px; }
+  .cfgSub { font-size:12px; color:#8A8A85; margin-bottom:16px; line-height:1.5; }
+  .exoCard { background:#131414; border:1px solid #232323; border-radius:12px; padding:14px 16px; margin-bottom:12px; }
+  .exoCardTitle { font-size:11px; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:#39FF6A; margin-bottom:10px; }
+  .fieldRow { display:grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap:10px; margin-bottom:8px; }
+  .field { min-width:0; display:flex; flex-direction:column; gap:4px; }
+  .field.full { grid-column: 1 / -1; }
+  .field label { font-size:9.5px; color:#8A8A85; text-transform:uppercase; letter-spacing:0.04em; font-weight:600; }
+  .field input { width:100%; box-sizing:border-box; background:#0B0D0E; border:1px solid #2A2A2A; border-radius:8px; color:#F5F5F0; font-size:13.5px; padding:8px 10px; font-family:'Inter',sans-serif; outline:none; }
+  .field input:focus { border-color:#39FF6A; }
+  .cfgActions { display:flex; gap:10px; margin-top:6px; margin-bottom:16px; padding-top:6px; }
+  .primaryBtn { flex:1; background:#39FF6A; color:#0B0D0E; border:none; border-radius:999px; padding:13px; font-size:13.5px; font-weight:700; font-family:'Inter',sans-serif; text-transform:uppercase; letter-spacing:0.03em; cursor:pointer; }
+  .ghostBtn { background:transparent; border:1px solid #2A2A2A; color:#B9B9B4; border-radius:999px; padding:13px 16px; font-size:13px; font-family:'Inter',sans-serif; cursor:pointer; }
+  .toast { position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(20px); background:#39FF6A; color:#0B0D0E; font-size:13px; font-weight:700; padding:10px 20px; border-radius:999px; opacity:0; transition: opacity .25s ease, transform .25s ease; pointer-events:none; }
+  .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="seance">Séance</button>
+    <button class="tab-btn" data-tab="config">⚙ Configuration</button>
+  </div>
+
+  <!-- ============ ONGLET SÉANCE ============ -->
+  <div class="panel active" id="panel-seance">
+    <div class="card" id="seance-card"></div>
+  </div>
+
+  <!-- ============ ONGLET CONFIGURATION ============ -->
+  <div class="panel" id="panel-config">
+    <div class="card cfgScroll">
+      <div class="cfgInner">
+      <div class="cfgTitle">Configuration</div>
+      <div class="cfgSub">Modifie les séries, répétitions, poids et récup' de chaque exercice, puis enregistre pour appliquer à la séance.</div>
+      <div id="cfg-exos"></div>
+      <div class="exoCard">
+        <div class="exoCardTitle">Enchaînement (superset)</div>
+        <div class="fieldRow">
+          <div class="field"><label>Manches</label><input type="number" min="1" id="ss-rounds" /></div>
+          <div class="field"><label>Récup entre manches (s)</label><input type="number" min="0" id="ss-rest" /></div>
+        </div>
+        <div class="fieldRow">
+          <div class="field full"><label>Exercice A — nom</label><input type="text" id="ssA-name" /></div>
+        </div>
+        <div class="fieldRow">
+          <div class="field"><label>Reps A</label><input type="number" min="0" id="ssA-reps" /></div>
+          <div class="field"><label>Poids total A (kg)</label><input type="number" min="0" id="ssA-weight" /></div>
+        </div>
+        <div class="fieldRow">
+          <div class="field full"><label>Exercice B — nom</label><input type="text" id="ssB-name" /></div>
+        </div>
+        <div class="fieldRow">
+          <div class="field"><label>Reps B</label><input type="number" min="0" id="ssB-reps" /></div>
+          <div class="field"><label>Poids total B (kg)</label><input type="number" min="0" id="ssB-weight" /></div>
+        </div>
+      </div>
+      <div class="cfgActions">
+        <button class="primaryBtn" id="cfg-save">Enregistrer et appliquer</button>
+        <button class="ghostBtn" id="cfg-reset">Réinitialiser</button>
+      </div>
+      <div class="exoCard" id="cfg-file-card">
+        <div class="exoCardTitle">💾 Sauvegarde automatique</div>
+        <div class="cfgSub" id="cfg-file-status" style="margin-bottom:12px;">chargement…</div>
+        <div class="cfgActions" style="margin-top:0; margin-bottom:0; padding-top:0;">
+          <button class="ghostBtn" id="cfg-link-file" style="flex:1;">🔗 Lier / créer config.json</button>
+          <button class="ghostBtn" id="cfg-unlink-file" style="flex:1; display:none;">✕ Dissocier</button>
+        </div>
+      </div>
+      <div class="cfgActions">
+        <button class="ghostBtn" id="cfg-export" style="flex:1;">⬇ Exporter la config (.json)</button>
+        <button class="ghostBtn" id="cfg-import-btn" style="flex:1;">⬆ Importer une config</button>
+        <input type="file" id="cfg-import-file" accept="application/json" style="display:none;" />
+      </div>
+      <div class="cfgSub" style="margin-top:10px;">Export/import = solution de secours manuelle (fonctionne partout, y compris Safari/Firefox). La liaison automatique ci-dessus met à jour le fichier config.json tout seul à chaque enregistrement, et le recharge tout seul à chaque ouverture de la page (Chrome/Edge).</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">Programme mis à jour</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------------- Données par défaut ---------------- */
+  const DEFAULT_EXO = [
+    { name: "Squats", reps: 6, weight: 24, sets: 3, rest: 90 },
+    { name: "SDT barre", reps: 13, weight: 20, sets: 3, rest: 90 },
+    { name: "Développé couché haltères", reps: 11, weight: 20, sets: 3, rest: 90 },
+    { name: "Rowing haltère", reps: 8, weight: 16, sets: 3, rest: 90 },
+  ];
+  const DEFAULT_SUPERSET = {
+    rounds: 3,
+    rest: 90,
+    a: { name: "Curl haltère", reps: 13, weight: 16 },
+    b: { name: "Extension haltère", reps: 10, weight: 16 },
+  };
+
+  let EXO = clone(DEFAULT_EXO);
+  let SUPERSET = clone(DEFAULT_SUPERSET);
+
+  function clone(o) { return JSON.parse(JSON.stringify(o)); }
+  function formatTime(s) {
+    s = Math.max(0, Math.round(s));
+    const m = Math.floor(s / 60);
+    const sec = s % 60;
+    return `${m}:${sec.toString().padStart(2, "0")}`;
+  }
+
+  /* ---------------- Bips du décompte (5 dernières secondes) ---------------- */
+  let audioCtx = null;
+  function getAudioCtx() {
+    if (!audioCtx) {
+      try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; }
+    }
+    if (audioCtx.state === "suspended") audioCtx.resume().catch(() => {});
+    return audioCtx;
+  }
+  function playBeep(freq, duration) {
+    const ctx = getAudioCtx();
+    if (!ctx) return;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "sine";
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.25, ctx.currentTime + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + duration);
+  }
+  function playCountdownBeep(secondsLeft) {
+    if (secondsLeft > 0) playBeep(700, 0.12);
+    else playBeep(1050, 0.22);
+  }
+
+  /* ---------------- Dégradé effort : vert jusqu'à 6, puis jaune -> orange -> rouge de 7 à 10 ---------------- */
+  const RATING_GREEN = { r: 0x39, g: 0xFF, b: 0x6A };
+  const RATING_HIGH_STOPS = [
+    { r: 0xFF, g: 0xD9, b: 0x3D }, // jaune (7)
+    { r: 0xFF, g: 0x6A, b: 0x3D }, // orange
+    { r: 0xFF, g: 0x3B, b: 0x3B }, // rouge (10)
+  ];
+  function ratingColor(n) {
+    if (n <= 6) return `rgb(${RATING_GREEN.r}, ${RATING_GREEN.g}, ${RATING_GREEN.b})`;
+    const t = (n - 7) / 3; // 0 à n=7 ... 1 à n=10
+    const segT = t * (RATING_HIGH_STOPS.length - 1);
+    const seg = Math.min(Math.floor(segT), RATING_HIGH_STOPS.length - 2);
+    const k = segT - seg;
+    const a = RATING_HIGH_STOPS[seg], b = RATING_HIGH_STOPS[seg + 1];
+    const r = Math.round(a.r + (b.r - a.r) * k);
+    const g = Math.round(a.g + (b.g - a.g) * k);
+    const bl = Math.round(a.b + (b.b - a.b) * k);
+    return `rgb(${r}, ${g}, ${bl})`;
+  }
+  function ratingButtonsHtml(currentValue) {
+    return Array.from({ length: 10 }, (_, k) => k + 1).map((n) => `
+      <button class="btn ratingBtn ${currentValue === n ? "selected" : ""}" data-n="${n}" style="background:${ratingColor(n)}">${n}</button>
+    `).join("");
+  }
+
+  /* ---------------- Persistance JSON (fichier lié + secours localStorage) ---------------- */
+  const LS_KEY = "5costauds_config_v1";
+  const DB_NAME = "5costauds_db";
+  const DB_STORE = "handles";
+  const HANDLE_KEY = "configFileHandle";
+  const supportsFS = "showSaveFilePicker" in window;
+
+  let fileHandle = null;
+  let fileStatusMode = "none"; // none | linked | locked
+
+  function idbOpen() {
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open(DB_NAME, 1);
+      req.onupgradeneeded = () => req.result.createObjectStore(DB_STORE);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  }
+  async function idbGet(key) {
+    try {
+      const db = await idbOpen();
+      return await new Promise((resolve, reject) => {
+        const tx = db.transaction(DB_STORE, "readonly");
+        const req = tx.objectStore(DB_STORE).get(key);
+        req.onsuccess = () => resolve(req.result || null);
+        req.onerror = () => reject(req.error);
+      });
+    } catch (e) { return null; }
+  }
+  async function idbSet(key, val) {
+    try {
+      const db = await idbOpen();
+      await new Promise((resolve, reject) => {
+        const tx = db.transaction(DB_STORE, "readwrite");
+        tx.objectStore(DB_STORE).put(val, key);
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+      });
+    } catch (e) { /* ignore */ }
+  }
+
+  function currentConfigObject() {
+    return { program: "5 Costauds", exo: EXO, superset: SUPERSET, savedAt: new Date().toISOString() };
+  }
+  function applyConfigObject(cfg) {
+    if (!cfg || !Array.isArray(cfg.exo) || !cfg.superset) return false;
+    EXO = cfg.exo;
+    SUPERSET = cfg.superset;
+    return true;
+  }
+  function saveToLocalStorage() {
+    try { localStorage.setItem(LS_KEY, JSON.stringify(currentConfigObject())); } catch (e) { /* ignore */ }
+  }
+  function loadFromLocalStorage() {
+    try {
+      const raw = localStorage.getItem(LS_KEY);
+      if (!raw) return false;
+      return applyConfigObject(JSON.parse(raw));
+    } catch (e) { return false; }
+  }
+
+  function updateFileStatus(mode) {
+    fileStatusMode = mode;
+    const el = document.getElementById("cfg-file-status");
+    const linkBtn = document.getElementById("cfg-link-file");
+    const unlinkBtn = document.getElementById("cfg-unlink-file");
+    if (!el) return;
+    const fname = (fileHandle && fileHandle.name) || "config.json";
+    if (mode === "linked") {
+      el.innerHTML = `🟢 lié à <b>${fname}</b> — chaque enregistrement met à jour ce fichier, et il se recharge tout seul à la prochaine ouverture.`;
+      if (linkBtn) linkBtn.textContent = "🔗 Changer de fichier";
+      if (unlinkBtn) unlinkBtn.style.display = "";
+    } else if (mode === "locked") {
+      el.innerHTML = `🟠 fichier lié (<b>${fname}</b>) mais le navigateur demande une confirmation après ce rechargement — un seul clic ci-dessous suffit.`;
+      if (linkBtn) linkBtn.textContent = "🔓 Réautoriser l'accès";
+      if (unlinkBtn) unlinkBtn.style.display = "";
+    } else {
+      el.innerHTML = supportsFS
+        ? `⚪ aucun fichier lié — clique ci-dessous pour créer/choisir un config.json (chargement 100% automatique ensuite).`
+        : `⚪ liaison auto indisponible sur ce navigateur — utilise export puis import ci-dessous, ou ouvre cette page avec Chrome/Edge pour l'auto-chargement.`;
+      if (linkBtn) linkBtn.textContent = "🔗 Lier / créer config.json";
+      if (unlinkBtn) unlinkBtn.style.display = "none";
+    }
+  }
+
+  async function writeToLinkedFile() {
+    if (!fileHandle) return;
+    try {
+      const perm = await fileHandle.queryPermission({ mode: "readwrite" });
+      if (perm !== "granted") { updateFileStatus("locked"); return; }
+      const writable = await fileHandle.createWritable();
+      await writable.write(JSON.stringify(currentConfigObject(), null, 2));
+      await writable.close();
+    } catch (e) { console.warn("écriture config.json échouée", e); }
+  }
+
+  async function tryAutoLoadFromFile() {
+    if (!supportsFS) return false;
+    const stored = await idbGet(HANDLE_KEY);
+    if (!stored) return false;
+    fileHandle = stored;
+    try {
+      const perm = await fileHandle.queryPermission({ mode: "read" });
+      if (perm !== "granted") { updateFileStatus("locked"); return false; }
+      const file = await fileHandle.getFile();
+      const text = await file.text();
+      if (!text.trim()) return false;
+      const cfg = JSON.parse(text);
+      if (applyConfigObject(cfg)) { updateFileStatus("linked"); return true; }
+      return false;
+    } catch (e) {
+      console.warn("chargement auto config.json échoué", e);
+      updateFileStatus("locked");
+      return false;
+    }
+  }
+
+  async function linkConfigFile() {
+    if (!supportsFS) { showToast("Non supporté ici : utilise export/import"); return; }
+    try {
+      const handle = await window.showSaveFilePicker({
+        suggestedName: "config.json",
+        types: [{ description: "Configuration JSON", accept: { "application/json": [".json"] } }],
+      });
+      fileHandle = handle;
+      await idbSet(HANDLE_KEY, handle);
+      let loaded = false;
+      try {
+        const file = await handle.getFile();
+        const text = await file.text();
+        if (text.trim()) { const cfg = JSON.parse(text); if (applyConfigObject(cfg)) loaded = true; }
+      } catch (e) { /* fichier vide ou illisible : on écrira la config actuelle */ }
+      if (!loaded) await writeToLinkedFile();
+      updateFileStatus("linked");
+      resetSession();
+      fillConfigForm();
+      showToast(loaded ? "Config chargée depuis le fichier" : "Fichier config.json lié");
+    } catch (e) { /* annulation par l'utilisateur : ignorer */ }
+  }
+
+  async function reauthorizeFile() {
+    if (!fileHandle) return;
+    try {
+      const perm = await fileHandle.requestPermission({ mode: "readwrite" });
+      if (perm === "granted") {
+        const file = await fileHandle.getFile();
+        const text = await file.text();
+        if (text.trim()) applyConfigObject(JSON.parse(text));
+        updateFileStatus("linked");
+        resetSession();
+        fillConfigForm();
+        showToast("Accès au fichier rétabli");
+      }
+    } catch (e) { /* ignore */ }
+  }
+
+  async function unlinkConfigFile() {
+    fileHandle = null;
+    await idbSet(HANDLE_KEY, null);
+    updateFileStatus("none");
+    showToast("Fichier dissocié");
+  }
+
+  /* ---------------- Construction des étapes ---------------- */
+  let STEPS = [];
+  let BLOCKS = [];
+  let BLOCK_OF_STEP = [];
+
+  function buildAll() {
+    STEPS = [];
+    EXO.forEach((ex, idx) => {
+      for (let s = 1; s <= ex.sets; s++) {
+        STEPS.push({ type: "work", name: ex.name, reps: ex.reps, weight: ex.weight, setNum: s, totalSets: ex.sets });
+        if (s < ex.sets) {
+          STEPS.push({ type: "rest", duration: ex.rest, label: `Prochaine série · ${ex.name}` });
+        }
+      }
+      const isLastExo = idx === EXO.length - 1;
+      const nextName = isLastExo ? SUPERSET.a.name : EXO[idx + 1].name;
+      const nextWeight = isLastExo ? SUPERSET.a.weight : EXO[idx + 1].weight;
+      STEPS.push({
+        type: "rest",
+        duration: ex.rest,
+        label: "Exercice suivant",
+        rating: true,
+        ratingLabel: ex.name,
+        nextName,
+        currentWeight: ex.weight,
+        nextWeight,
+      });
+    });
+    for (let r = 1; r <= SUPERSET.rounds; r++) {
+      STEPS.push({
+        type: "work",
+        superset: true,
+        setNum: r,
+        totalSets: SUPERSET.rounds,
+        a: { name: SUPERSET.a.name, reps: SUPERSET.a.reps, weight: SUPERSET.a.weight },
+        b: { name: SUPERSET.b.name, reps: SUPERSET.b.reps, weight: SUPERSET.b.weight },
+      });
+      if (r < SUPERSET.rounds) {
+        STEPS.push({ type: "rest", duration: SUPERSET.rest, label: "Prochain enchaînement" });
+      } else {
+        STEPS.push({
+          type: "rest",
+          duration: 0,
+          noTimer: true,
+          label: "Séance terminée",
+          rating: true,
+          dualRating: true,
+          ratingA: SUPERSET.a.name,
+          ratingB: SUPERSET.b.name,
+          nextName: null,
+          currentWeight: null,
+          nextWeight: null,
+        });
+      }
+    }
+    STEPS.push({ type: "done" });
+
+    BLOCKS = EXO.map((ex) => ({ label: ex.name })).concat([{ label: `${SUPERSET.a.name} / ${SUPERSET.b.name}` }]);
+
+    BLOCK_OF_STEP = STEPS.map((s) => {
+      if (s.type === "done") return BLOCKS.length - 1;
+      if (s.superset) return EXO.length;
+      const idx = EXO.findIndex((ex) => ex.name === s.name);
+      return idx !== -1 ? idx : null;
+    });
+    for (let k = 1; k < BLOCK_OF_STEP.length; k++) {
+      if (BLOCK_OF_STEP[k] === null) BLOCK_OF_STEP[k] = BLOCK_OF_STEP[k - 1];
+    }
+  }
+
+  function stepSeriesCount(s) {
+    if (s.type !== "work") return 0;
+    return s.superset ? 2 : 1;
+  }
+
+  /* ---------------- État de la séance ---------------- */
+  let state = {};
+  function resetSession() {
+    buildAll();
+    if (state.totalTimer) clearInterval(state.totalTimer);
+    if (state.restTimer) clearInterval(state.restTimer);
+    const ratings = Array(BLOCKS.length).fill(null);
+    ratings[BLOCKS.length - 1] = { a: null, b: null };
+    state = {
+      started: false,
+      i: 0,
+      running: false,
+      secondsLeft: STEPS[0] && STEPS[0].type === "rest" ? STEPS[0].duration : 0,
+      totalElapsed: 0,
+      workElapsed: 0,
+      restElapsed: 0,
+      blockElapsed: Array(BLOCKS.length).fill(0),
+      ratings,
+      totalTimer: null,
+      restTimer: null,
+    };
+    renderSeance();
+  }
+
+  function goTo(idx) {
+    state.i = idx;
+    state.running = true;
+    const s = STEPS[idx];
+    state.secondsLeft = s && s.type === "rest" ? s.duration : 0;
+    startRestTimerIfNeeded();
+    renderSeance();
+  }
+  function next() { if (state.i < STEPS.length - 1) goTo(state.i + 1); }
+  function prev() { if (state.i > 0) goTo(state.i - 1); }
+
+  function startTotalTimer() {
+    if (state.totalTimer) clearInterval(state.totalTimer);
+    state.totalTimer = setInterval(() => {
+      const step = STEPS[state.i];
+      if (!state.started || !state.running || step.type === "done") return;
+      state.totalElapsed += 1;
+      if (step.type === "work") state.workElapsed += 1; else state.restElapsed += 1;
+      const b = BLOCK_OF_STEP[state.i];
+      if (b != null) state.blockElapsed[b] += 1;
+      renderTopBar();
+      renderProgressBar();
+    }, 1000);
+  }
+
+  function startRestTimerIfNeeded() {
+    if (state.restTimer) clearInterval(state.restTimer);
+    const step = STEPS[state.i];
+    if (state.running && step.type === "rest" && !step.noTimer) {
+      state.restTimer = setInterval(() => {
+        if (!state.running) return;
+        state.secondsLeft -= 1;
+        if (state.secondsLeft <= 5) playCountdownBeep(state.secondsLeft);
+        if (state.secondsLeft <= 0) {
+          clearInterval(state.restTimer);
+          state.running = false;
+          renderSeance();
+          setTimeout(() => next(), 400);
+          return;
+        }
+        renderRestRing();
+      }, 1000);
+    }
+  }
+
+  function togglePause() {
+    getAudioCtx();
+    state.running = !state.running;
+    startRestTimerIfNeeded();
+    renderSeance();
+  }
+
+  function handleStart() {
+    getAudioCtx();
+    state.started = true;
+    state.running = true;
+    startTotalTimer();
+    startRestTimerIfNeeded();
+    renderSeance();
+  }
+
+  function handleRestart() { resetSession(); }
+
+  /* ---------------- estimation kcal ---------------- */
+  const MET_WORK = 5.5;
+  const MET_REST = 1.5;
+  function estimateKcal(workSeconds, restSeconds, weightKg) {
+    if (!weightKg || weightKg <= 0) return null;
+    const kcal = (workSeconds / 3600) * MET_WORK * weightKg + (restSeconds / 3600) * MET_REST * weightKg;
+    return Math.round(kcal);
+  }
+
+  /* ---------------- rendu ---------------- */
+  const cardEl = document.getElementById("seance-card");
+
+  function renderSeance() {
+    const step = STEPS[state.i];
+    if (!state.started) {
+      const totalWork = STEPS.reduce((sum, s) => sum + stepSeriesCount(s), 0);
+      cardEl.innerHTML = `
+        <div class="startWrap">
+          <div class="startIconWrap">🏋️</div>
+          <div class="startTitle">5 Costauds</div>
+          <div class="startSub">${EXO.length} exercices + l'enchaînement ${SUPERSET.a.name.toLowerCase()} / ${SUPERSET.b.name.toLowerCase()} · ${totalWork} séries au total</div>
+          <div class="startHint">le chrono démarre à l'appui sur commencer, et tourne en continu jusqu'à la fin</div>
+          <button class="btn pillBtn" id="start-btn">▶ commencer</button>
+        </div>`;
+      document.getElementById("start-btn").onclick = handleStart;
+      return;
+    }
+
+    let html = `
+      <div class="topBar" id="topBar"></div>
+      ${step.type !== "done" ? `
+      <div class="topNavRow">
+        <button class="btn topNavBtn" id="prev-btn" ${state.i === 0 ? "disabled" : ""}>‹ précédent</button>
+        <button class="btn topNavBtn" id="next-btn">suivant ›</button>
+      </div>` : ""}
+      <div class="progressBarWrap" id="progressBar"></div>
+      <div id="upNext" class="upNext"></div>
+      <div id="stepBody"></div>
+      ${step.type !== "done" ? `
+      <div class="bottomBar">
+        <button class="btn pauseBtn" id="pause-btn" style="background:${state.running ? "#FF3B3B" : "#39FF6A"}; color:${state.running ? "#F5F5F0" : "#0B0D0E"}">
+          ${state.running ? "⏸ pause séance" : "▶ reprendre"}
+        </button>
+      </div>` : ""}
+    `;
+    cardEl.innerHTML = html;
+
+    renderTopBar();
+    if (step.type !== "done") {
+      document.getElementById("prev-btn").onclick = prev;
+      document.getElementById("next-btn").onclick = next;
+      document.getElementById("pause-btn").onclick = togglePause;
+    }
+    renderProgressBar();
+    renderUpNext();
+    renderStepBody();
+  }
+
+  function renderTopBar() {
+    const el = document.getElementById("topBar");
+    if (!el) return;
+    const doneCount = STEPS.slice(0, state.i).reduce((sum, s) => sum + stepSeriesCount(s), 0);
+    const totalWork = STEPS.reduce((sum, s) => sum + stepSeriesCount(s), 0);
+    el.innerHTML = `
+      <div class="brandRow"><span style="color:#39FF6A;font-size:15px;">🏋️</span><span class="brandText">5 Costauds</span></div>
+      <div class="topRight">
+        <span class="globalTimer">⏱ ${formatTime(state.totalElapsed)}</span>
+        <span class="counter">${doneCount}/${totalWork} séries</span>
+      </div>`;
+  }
+
+  function renderProgressBar() {
+    const el = document.getElementById("progressBar");
+    if (!el) return;
+    const step = STEPS[state.i];
+    const currentBlock = BLOCK_OF_STEP[state.i];
+    const isDone = step.type === "done";
+    el.innerHTML = BLOCKS.map((b, idx) => {
+      const st = isDone || idx < currentBlock ? "done" : idx === currentBlock ? "current" : "upcoming";
+      const elapsed = state.blockElapsed[idx] || 0;
+      const showTime = st === "done" || (st === "current" && elapsed > 0);
+      return `
+        <div class="progressSegmentWrap">
+          <div class="progressSegment ${st !== "upcoming" ? "filled" : ""} ${st === "current" ? "pulse" : ""}"></div>
+          <div class="progressTime ${st === "current" ? "current" : ""}">${showTime ? formatTime(elapsed) : "&nbsp;"}</div>
+          <div class="progressSegLabel ${st}">${b.label}</div>
+        </div>`;
+    }).join("");
+  }
+
+  function renderUpNext() {
+    const el = document.getElementById("upNext");
+    if (!el) return;
+    const step = STEPS[state.i];
+    const currentBlock = BLOCK_OF_STEP[state.i];
+    if (step.type === "done") { el.textContent = ""; return; }
+    let label = null;
+    for (let k = state.i + 1; k < BLOCK_OF_STEP.length; k++) {
+      if (BLOCK_OF_STEP[k] !== currentBlock) { label = BLOCKS[BLOCK_OF_STEP[k]].label; break; }
+    }
+    el.textContent = label ? `à venir · ${label}` : "";
+  }
+
+  function renderStepBody() {
+    const el = document.getElementById("stepBody");
+    const step = STEPS[state.i];
+    if (step.type === "work" && step.superset) {
+      el.innerHTML = `
+        <div class="workWrap">
+          <div class="supersetTag">Enchaînement · manche ${step.setNum}/${step.totalSets}</div>
+          <div class="exoName" style="margin-bottom:14px;">${step.a.name}</div>
+          <div class="statRow">
+            <div class="statBox"><div class="statValue">${step.setNum} / ${step.totalSets}</div><div class="statLabel">manche</div></div>
+            <div class="statBox"><div class="statValue">${step.a.reps}</div><div class="statLabel">reps</div></div>
+            <div class="statBox"><div class="statValue">${step.a.weight} kg</div><div class="statLabel">poids total</div></div>
+          </div>
+          <div class="weightHint">soit ${step.a.weight / 2} kg par haltère si tu en utilises deux</div>
+          <div class="supersetHint">Enchaîne directement avec ${step.b.name}, sans pause</div>
+          <div class="exoName" style="font-size:24px; margin-bottom:14px;">${step.b.name}</div>
+          <div class="statRow">
+            <div class="statBox"><div class="statValue">${step.setNum} / ${step.totalSets}</div><div class="statLabel">manche</div></div>
+            <div class="statBox"><div class="statValue">${step.b.reps}</div><div class="statLabel">reps</div></div>
+            <div class="statBox"><div class="statValue">${step.b.weight} kg</div><div class="statLabel">poids total</div></div>
+          </div>
+          <div class="weightHint">soit ${step.b.weight / 2} kg par haltère si tu en utilises deux</div>
+          <button class="btn pillBtn" id="done-set-btn">✓ manche terminée</button>
+        </div>`;
+      document.getElementById("done-set-btn").onclick = next;
+    } else if (step.type === "work") {
+      el.innerHTML = `
+        <div class="workWrap">
+          <div class="exoName">${step.name}</div>
+          <div class="statRow">
+            <div class="statBox"><div class="statValue">${step.setNum} / ${step.totalSets}</div><div class="statLabel">série</div></div>
+            <div class="statBox"><div class="statValue">${step.reps}</div><div class="statLabel">reps</div></div>
+            <div class="statBox"><div class="statValue">${step.weight} kg</div><div class="statLabel">poids total</div></div>
+          </div>
+          <div class="weightHint">soit ${step.weight / 2} kg par haltère si tu en utilises deux</div>
+          <button class="btn pillBtn" id="done-set-btn">✓ série terminée</button>
+        </div>`;
+      document.getElementById("done-set-btn").onclick = next;
+    } else if (step.type === "rest") {
+      const blockIdx = BLOCK_OF_STEP[state.i];
+      const weightChanged = step.nextName && step.currentWeight !== step.nextWeight;
+      const noTimer = step.noTimer;
+      el.innerHTML = `
+        <div class="restWrap">
+          <div class="restLabel">${step.label}</div>
+          ${weightChanged ? `<div class="weightChangeNote">⚠️ prochain poids · ${step.nextName} : <b>${step.nextWeight} kg</b> (au lieu de ${step.currentWeight} kg)</div>` : ""}
+          ${noTimer ? "" : `
+          <div class="ringWrap">
+            <svg width="260" height="260" viewBox="0 0 260 260">
+              <circle cx="130" cy="130" r="110" fill="none" stroke="#232323" stroke-width="14" />
+              <circle id="rest-ring" cx="130" cy="130" r="110" fill="none" stroke="#FF6A3D" stroke-width="14"
+                stroke-linecap="round" transform="rotate(-90 130 130)" style="transition: stroke-dashoffset 1s linear" />
+            </svg>
+            <div class="timerCenter" id="rest-time"></div>
+          </div>`}
+          ${step.rating ? (step.dualRating ? `
+          <div class="ratingBox">
+            <div class="ratingLabelText">note l'effort · ${step.ratingA}</div>
+            <div class="ratingGrid" data-sub="a">
+              ${ratingButtonsHtml(state.ratings[blockIdx].a)}
+            </div>
+          </div>
+          <div class="ratingBox">
+            <div class="ratingLabelText">note l'effort · ${step.ratingB}</div>
+            <div class="ratingGrid" data-sub="b">
+              ${ratingButtonsHtml(state.ratings[blockIdx].b)}
+            </div>
+          </div>` : `
+          <div class="ratingBox">
+            <div class="ratingLabelText">note l'effort · ${step.ratingLabel}</div>
+            <div class="ratingGrid" data-sub="">
+              ${ratingButtonsHtml(state.ratings[blockIdx])}
+            </div>
+          </div>`) : ""}
+          <div class="restBtnRow">
+            ${noTimer ? "" : `<button class="btn circleBtn" id="rest-pause-btn"></button>`}
+            <button class="btn skipBtn" id="rest-skip-btn">${noTimer ? "✓ terminer la séance" : "⏭ passer le repos"}</button>
+          </div>
+        </div>`;
+      if (!noTimer) document.getElementById("rest-pause-btn").onclick = togglePause;
+      document.getElementById("rest-skip-btn").onclick = next;
+      if (step.rating) {
+        document.querySelectorAll(".ratingGrid").forEach((grid) => {
+          const sub = grid.dataset.sub;
+          grid.querySelectorAll(".ratingBtn").forEach((btn) => {
+            btn.onclick = () => {
+              const val = parseInt(btn.dataset.n, 10);
+              if (sub) state.ratings[blockIdx][sub] = val;
+              else state.ratings[blockIdx] = val;
+              renderStepBody();
+            };
+          });
+        });
+      }
+      if (!noTimer) renderRestRing();
+    } else if (step.type === "done") {
+      const kcalBoxId = "weight-input";
+      el.innerHTML = `
+        <div class="doneWrap">
+          <div class="doneTitle">Séance terminée</div>
+          <div class="doneSub">${EXO.length} exercices + l'enchaînement ${SUPERSET.a.name.toLowerCase()} / ${SUPERSET.b.name.toLowerCase()}, dans l'ordre. Bien joué.</div>
+          <div class="recapBox">
+            <div class="recapTotalRow">
+              <span class="recapTotalLabel">⏱ temps total</span>
+              <span class="recapTotalValue">${formatTime(state.totalElapsed)}</span>
+            </div>
+            <div class="recapDivider"></div>
+            <div class="recapTable">
+              <div class="recapRow recapHeaderRow"><span></span><span>temps</span><span>effort</span></div>
+              ${BLOCKS.map((b, idx) => {
+                const stripe = idx % 2 === 0 ? "stripe" : "";
+                const isSuperset = idx === BLOCKS.length - 1;
+                if (isSuperset) {
+                  const r = state.ratings[idx] || {};
+                  return `
+                    <div class="recapRow ${stripe}"><span>${b.label}</span><span class="recapValue">${formatTime(state.blockElapsed[idx] || 0)}</span><span class="recapValue"></span></div>
+                    <div class="recapRow sub ${stripe}"><span><span class="recapArrow">↳</span>${SUPERSET.a.name}</span><span class="recapValue"></span><span class="recapValue">${r.a != null ? `${r.a}/10` : "—"}</span></div>
+                    <div class="recapRow sub ${stripe}"><span><span class="recapArrow">↳</span>${SUPERSET.b.name}</span><span class="recapValue"></span><span class="recapValue">${r.b != null ? `${r.b}/10` : "—"}</span></div>
+                  `;
+                }
+                return `
+                  <div class="recapRow ${stripe}"><span>${b.label}</span><span class="recapValue">${formatTime(state.blockElapsed[idx] || 0)}</span><span class="recapValue">${state.ratings[idx] != null ? `${state.ratings[idx]}/10` : "—"}</span></div>
+                `;
+              }).join("")}
+            </div>
+            <div class="recapDivider"></div>
+            <label class="weightLabel" for="${kcalBoxId}">ton poids, pour estimer les kcal</label>
+            <div class="weightInputRow">
+              <input class="weightInput" id="${kcalBoxId}" type="number" inputmode="decimal" min="0" placeholder="ex. 72" />
+              <span class="weightUnit">kg</span>
+            </div>
+            <div class="kcalRow">
+              <span class="kcalLabel">dépense estimée</span>
+              <span class="kcalValue" id="kcal-value">—</span>
+            </div>
+            <div class="kcalNote" id="kcal-note" style="display:none;">estimation à partir du temps de travail actif et de récupération, pas une mesure exacte</div>
+          </div>
+          <button class="btn restartBtn" id="restart-btn">↺ recommencer</button>
+        </div>`;
+      document.getElementById("restart-btn").onclick = handleRestart;
+      document.getElementById(kcalBoxId).addEventListener("input", (e) => {
+        const w = parseFloat(e.target.value.replace(",", "."));
+        const kcal = estimateKcal(state.workElapsed, state.restElapsed, w);
+        document.getElementById("kcal-value").textContent = kcal !== null ? `${kcal} kcal` : "—";
+        document.getElementById("kcal-note").style.display = kcal !== null ? "block" : "none";
+      });
+    }
+  }
+
+  function renderRestRing() {
+    const step = STEPS[state.i];
+    if (!step || step.type !== "rest") return;
+    const ring = document.getElementById("rest-ring");
+    const timeEl = document.getElementById("rest-time");
+    const pauseBtn = document.getElementById("rest-pause-btn");
+    if (!ring) return;
+    const R = 110, C = 2 * Math.PI * R;
+    const progress = 1 - state.secondsLeft / step.duration;
+    ring.style.strokeDasharray = C;
+    ring.style.strokeDashoffset = C * (1 - progress);
+    timeEl.textContent = formatTime(state.secondsLeft);
+    timeEl.classList.toggle("pulse", state.secondsLeft <= 5 && state.running);
+    if (pauseBtn) pauseBtn.textContent = state.running ? "⏸" : "▶";
+  }
+
+  /* ---------------- Onglets ---------------- */
+  document.querySelectorAll(".tab-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"));
+      document.querySelectorAll(".panel").forEach((p) => p.classList.remove("active"));
+      btn.classList.add("active");
+      document.getElementById(`panel-${btn.dataset.tab}`).classList.add("active");
+      if (btn.dataset.tab === "config") fillConfigForm();
+    });
+  });
+
+  /* ---------------- Onglet configuration ---------------- */
+  const cfgExosEl = document.getElementById("cfg-exos");
+
+  function fillConfigForm() {
+    cfgExosEl.innerHTML = EXO.map((ex, idx) => `
+      <div class="exoCard">
+        <div class="exoCardTitle">Exercice ${idx + 1}</div>
+        <div class="fieldRow">
+          <div class="field full"><label>Nom</label><input type="text" data-idx="${idx}" data-key="name" class="exo-input" value="${ex.name}" /></div>
+        </div>
+        <div class="fieldRow">
+          <div class="field"><label>Séries</label><input type="number" min="1" data-idx="${idx}" data-key="sets" class="exo-input" value="${ex.sets}" /></div>
+          <div class="field"><label>Répétitions</label><input type="number" min="0" data-idx="${idx}" data-key="reps" class="exo-input" value="${ex.reps}" /></div>
+        </div>
+        <div class="fieldRow">
+          <div class="field"><label>Poids total (kg)</label><input type="number" min="0" step="0.5" data-idx="${idx}" data-key="weight" class="exo-input" value="${ex.weight}" /></div>
+          <div class="field"><label>Récup' (s)</label><input type="number" min="0" data-idx="${idx}" data-key="rest" class="exo-input" value="${ex.rest}" /></div>
+        </div>
+      </div>
+    `).join("");
+
+    document.getElementById("ss-rounds").value = SUPERSET.rounds;
+    document.getElementById("ss-rest").value = SUPERSET.rest;
+    document.getElementById("ssA-name").value = SUPERSET.a.name;
+    document.getElementById("ssA-reps").value = SUPERSET.a.reps;
+    document.getElementById("ssA-weight").value = SUPERSET.a.weight;
+    document.getElementById("ssB-name").value = SUPERSET.b.name;
+    document.getElementById("ssB-reps").value = SUPERSET.b.reps;
+    document.getElementById("ssB-weight").value = SUPERSET.b.weight;
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    setTimeout(() => t.classList.remove("show"), 1600);
+  }
+
+  document.getElementById("cfg-save").addEventListener("click", () => {
+    document.querySelectorAll(".exo-input").forEach((input) => {
+      const idx = parseInt(input.dataset.idx, 10);
+      const key = input.dataset.key;
+      if (key === "name") {
+        EXO[idx].name = input.value.trim() || EXO[idx].name;
+      } else {
+        const v = parseFloat(input.value);
+        EXO[idx][key] = isNaN(v) ? EXO[idx][key] : v;
+      }
+    });
+    SUPERSET.rounds = parseInt(document.getElementById("ss-rounds").value, 10) || SUPERSET.rounds;
+    SUPERSET.rest = parseFloat(document.getElementById("ss-rest").value);
+    if (isNaN(SUPERSET.rest)) SUPERSET.rest = DEFAULT_SUPERSET.rest;
+    SUPERSET.a.name = document.getElementById("ssA-name").value.trim() || SUPERSET.a.name;
+    SUPERSET.a.reps = parseFloat(document.getElementById("ssA-reps").value) || SUPERSET.a.reps;
+    SUPERSET.a.weight = parseFloat(document.getElementById("ssA-weight").value) || SUPERSET.a.weight;
+    SUPERSET.b.name = document.getElementById("ssB-name").value.trim() || SUPERSET.b.name;
+    SUPERSET.b.reps = parseFloat(document.getElementById("ssB-reps").value) || SUPERSET.b.reps;
+    SUPERSET.b.weight = parseFloat(document.getElementById("ssB-weight").value) || SUPERSET.b.weight;
+
+    resetSession();
+    saveToLocalStorage();
+    writeToLinkedFile();
+    showToast("Programme mis à jour");
+    document.querySelector('.tab-btn[data-tab="seance"]').click();
+  });
+
+  document.getElementById("cfg-reset").addEventListener("click", () => {
+    EXO = clone(DEFAULT_EXO);
+    SUPERSET = clone(DEFAULT_SUPERSET);
+    fillConfigForm();
+    resetSession();
+    saveToLocalStorage();
+    writeToLinkedFile();
+    showToast("Valeurs par défaut restaurées");
+  });
+
+  document.getElementById("cfg-export").addEventListener("click", () => {
+    const blob = new Blob([JSON.stringify(currentConfigObject(), null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "config.json";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  });
+
+  document.getElementById("cfg-import-btn").addEventListener("click", () => {
+    document.getElementById("cfg-import-file").click();
+  });
+
+  document.getElementById("cfg-import-file").addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const cfg = JSON.parse(reader.result);
+        if (applyConfigObject(cfg)) {
+          resetSession();
+          fillConfigForm();
+          saveToLocalStorage();
+          writeToLinkedFile();
+          showToast("Config importée");
+        } else {
+          showToast("Fichier invalide");
+        }
+      } catch (err) { showToast("Fichier invalide"); }
+    };
+    reader.readAsText(file);
+    e.target.value = "";
+  });
+
+  document.getElementById("cfg-link-file").addEventListener("click", () => {
+    if (fileStatusMode === "locked") reauthorizeFile();
+    else linkConfigFile();
+  });
+  document.getElementById("cfg-unlink-file").addEventListener("click", unlinkConfigFile);
+
+  /* ---------------- init ---------------- */
+  (async function initConfig() {
+    const fileLoaded = await tryAutoLoadFromFile();
+    if (!fileLoaded) {
+      loadFromLocalStorage();
+      updateFileStatus(fileHandle ? "locked" : "none");
+    }
+    resetSession();
+    fillConfigForm();
+  })();
+})();
+</script>
+</body>
+</html>
