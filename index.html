@@ -28,7 +28,7 @@
   }
   .tabs {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 6px;
     background: #131414;
     border: 1px solid #232323;
@@ -77,7 +77,18 @@
   /* ---------- top bar / progress (séance) ---------- */
   .topBar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
   .brandRow { display: flex; align-items: center; gap: 8px; }
-  .brandText { font-size: 13px; font-weight: 600; letter-spacing: 0.04em; color: #B9B9B4; text-transform: uppercase; }
+  .brandBtn {
+    display: inline-flex; align-items: center; gap: 8px; background: transparent; border: none;
+    padding: 0; cursor: pointer; font: inherit; color: inherit;
+  }
+  .brandText {
+    font-family: 'Anton', sans-serif;
+    font-size: 26px;
+    line-height: 1;
+    letter-spacing: 0.01em;
+    color: #F5F5F0;
+    text-transform: uppercase;
+  }
   .topRight { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
   .globalTimer { display:flex; align-items:center; gap:4px; font-size:12px; color:#39FF6A; font-weight:700; font-variant-numeric: tabular-nums; }
   .counter { font-size: 12px; color: #8A8A85; font-weight: 500; }
@@ -100,25 +111,80 @@
   /* ---------- start screen ---------- */
   .startWrap { display:flex; flex-direction:column; align-items:center; justify-content:center; flex:1; text-align:center; gap:8px; padding:10px 6px; }
   .startIconWrap { width:64px; height:64px; border-radius:50%; background:#161717; border:1px solid #232323; display:flex; align-items:center; justify-content:center; margin-bottom:10px; font-size:26px; }
-  .startTitle { font-family:'Anton', sans-serif; font-size:28px; color:#F5F5F0; text-transform:uppercase; letter-spacing:0.01em; }
+  .startTitle { font-family:'Anton', sans-serif; font-size:26px; color:#F5F5F0; text-transform:uppercase; letter-spacing:0.01em; }
   .startSub { font-size:13px; color:#B9B9B4; max-width:280px; line-height:1.5; }
   .startHint { font-size:11.5px; color:#7A7A75; max-width:260px; line-height:1.5; margin-bottom:12px; }
   .pillBtn { display:flex; align-items:center; gap:8px; background:#39FF6A; color:#0B0D0E; border:none; border-radius:999px; padding:14px 32px; font-size:15px; font-weight:700; font-family:'Inter',sans-serif; }
 
   .startWrap--compact { justify-content:flex-start; padding-top:24px; }
-  .exoStartBlock { display:flex; flex-direction:column; align-items:center; gap:8px; width:100%; padding:20px 6px; border-bottom:1px solid #1B1C1C; }
+  .exoStartBlock { display:flex; flex-direction:column; align-items:center; gap:8px; width:100%; padding:20px 6px; border-bottom:1px solid #1B1C1C; min-height: 180px; }
   .exoStartBlock:first-child { padding-top:0; }
   .exoStartBlock--last { border-bottom:none; padding-bottom:12px; }
   .exoStartBlock .startTitle { font-size:22px; }
-  .exoStartBlock .pillBtn { margin-top:4px; padding:11px 26px; font-size:14px; }
+  .exoStartBlock .pillBtn { margin-top:auto; padding:11px 26px; font-size:14px; }
   .startWrap--compact > .startHint { margin-top:18px; }
+
+  .historyPage { display:flex; flex-direction:column; flex:1; gap:14px; }
+  .historyHeader { display:flex; flex-direction:column; align-items:center; text-align:center; gap:8px; }
+  .historyMeta { font-size:12px; color:#8A8A85; }
+  .historyList { display:flex; flex-direction:column; gap:10px; margin-top:8px; }
+  .historyItem {
+    display:grid; grid-template-columns: minmax(0,1.4fr) auto auto minmax(120px, auto); align-items:center; gap:10px;
+    background:#161717; border:1px solid #232323; border-radius:12px; padding:12px 12px;
+    white-space:nowrap;
+  }
+  .historyName {
+    font-size:13px; color:#F5F5F0; font-weight:700; overflow:hidden; text-overflow:ellipsis;
+  }
+  .historyDetail { font-size:11px; color:#9A9A94; }
+  .historyTime { font-size:11px; color:#39FF6A; font-weight:700; }
+  .historyActionsInline { display:flex; justify-content:flex-end; gap:8px; }
+  .historyDetailBtn, .historyDeleteBtn {
+    border:none; background:#2A2A2A; color:#F5F5F0; border-radius:999px; padding:7px 10px;
+    font-size:11px; font-family:'Inter',sans-serif; cursor:pointer; white-space:nowrap;
+  }
+  .historyDetailBtn { background:#1F2E2B; color:#39FF6A; }
+  .historyEmpty {
+    background:#161717; border:1px solid #232323; border-radius:12px; padding:16px; text-align:center; color:#B9B9B4; font-size:13px;
+  }
+  .historyActions { display:flex; justify-content:center; margin-top:8px; }
+  .historyClearBtn {
+    border:1px solid #2A2A2A; background:transparent; color:#F5F5F0; border-radius:999px; padding:10px 16px;
+    font-size:12.5px; font-family:'Inter',sans-serif; cursor:pointer;
+  }
+  .historyBackBtn {
+    border:none; background:#39FF6A; color:#0B0D0E; border-radius:999px; padding:10px 20px;
+    font-size:13px; font-weight:700; font-family:'Inter',sans-serif; cursor:pointer; min-width:130px;
+  }
+
+  .historyModal {
+    position:fixed; inset:0; background:rgba(11,13,14,0.72); display:flex; align-items:center; justify-content:center;
+    padding:16px; z-index:200;
+  }
+  .historyModalCard {
+    width:min(420px, 100%); background:#151718; border:1px solid #2A2A2A; border-radius:18px; padding:18px 16px;
+    box-shadow:0 14px 30px rgba(0,0,0,0.35);
+  }
+  .historyModalTitle { font-size:18px; font-weight:800; color:#F5F5F0; margin-bottom:6px; }
+  .historyModalMeta { font-size:12px; color:#9A9A94; margin-bottom:12px; }
+  .historyModalList { display:flex; flex-direction:column; gap:8px; margin-bottom:12px; }
+  .historyModalRow, .historyModalTotal { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:8px 10px; border-radius:10px; background:#1A1B1B; }
+  .historyModalRow span, .historyModalTotal span { color:#D7D7D1; font-size:12px; }
+  .historyModalRow strong, .historyModalTotal strong { color:#39FF6A; font-size:12px; }
+  .historyModalTotal { margin-top:4px; padding-top:10px; border-top:1px solid #2A2A2A; }
+  .historyCloseBtn {
+    margin-top:12px; width:100%; border:none; background:#39FF6A; color:#0B0D0E; border-radius:999px; padding:10px 16px;
+    font-size:12.5px; font-weight:700; font-family:'Inter',sans-serif; cursor:pointer;
+  }
 
   /* ---------- pyramide / fatburner screen ---------- */
   .pyWrap { display:flex; flex-direction:column; flex:1; }
   .pyHeader { text-align:center; margin-bottom:18px; }
+  .pyTitleRow { display:flex; align-items:center; justify-content:center; gap:8px; }
+  .pyTitleIcon { color:#39FF6A; font-size:15px; line-height:1; }
   .pyTitle { font-family:'Anton', sans-serif; font-size:26px; color:#F5F5F0; text-transform:uppercase; letter-spacing:0.01em; }
   .pySub { font-size:12.5px; color:#B9B9B4; margin-top:4px; }
-  .pyLevelBox { display:flex; flex-direction:column; align-items:center; gap:10px; background:#161717; border:1px solid #232323; border-radius:14px; padding:16px 18px; margin-bottom:14px; }
+  .pyLevelBox { display:flex; flex-direction:column; align-items:center; gap:10px; background:#161717; border:1px solid #232323; border-radius:14px; padding:16px 18px 18px; margin-bottom:20px; }
   .pyLevelCount { font-size:11px; color:#8A8A85; text-transform:uppercase; letter-spacing:0.05em; font-weight:600; }
   .pyLevelRow { display:flex; align-items:center; justify-content:center; gap:18px; width:100%; }
   .pyLevelPrev { width:38px; height:38px; border-radius:50%; background:#0B0D0E; border:1px solid #2A2A2A; color:#B9B9B4; font-size:16px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
@@ -127,11 +193,25 @@
   .pyLevelCenter { display:flex; flex-direction:column; align-items:center; min-width:90px; }
   .pyLevelValue { font-family:'Anton', sans-serif; font-size:44px; color:#39FF6A; line-height:1; font-variant-numeric: tabular-nums; }
   .pyLevelPhase { font-size:11px; color:#B9B9B4; text-transform:uppercase; letter-spacing:0.05em; font-weight:600; margin-top:2px; }
-  .pyLevelNextBtn { padding:11px 26px; font-size:13.5px; }
-  .pyLevelNextBtn:disabled { opacity:.55; }
-  .pyChronoBox { display:flex; flex-direction:column; align-items:center; gap:12px; background:#161717; border:1px solid #232323; border-radius:14px; padding:18px; margin-bottom:20px; }
   .pyChronoValue { font-family:'Anton', sans-serif; font-size:44px; color:#39FF6A; font-variant-numeric: tabular-nums; letter-spacing:0.02em; }
-  .pyChronoBox .pillBtn { padding:11px 28px; font-size:13.5px; }
+  .pyActionRow { display:flex; justify-content:center; align-items:center; gap:12px; width:100%; }
+  .pyLevelNextBtn, .pyChronoBtn { display:flex; align-items:center; justify-content:center; text-align:center; white-space:nowrap; width:auto; padding:12px 18px; font-size:15px; font-weight:700; }
+  .pyLevelNextBtn { flex:1 1 auto; max-width:200px; }
+  .pyLevelNextBtn .arrow { font-size:1.3em; line-height:1; display:inline-block; transform:translateY(-1px); }
+  .pyChronoBtn { flex:0 0 auto; min-width:auto; }
+  .pyLevelNextBtn {
+    opacity: 0.35;
+    background: rgba(57, 255, 106, 0.12);
+    color: rgba(245, 245, 240, 0.8);
+    border: 1px solid rgba(57, 255, 106, 0.18);
+  }
+  .pyLevelNextBtn.active {
+    opacity: 1;
+    background: #39FF6A;
+    color: #0B0D0E;
+    border-color: #39FF6A;
+  }
+  .pyLevelNextBtn:disabled { opacity:.55; }
   .pyExoList { display:flex; flex-direction:column; gap:12px; margin-bottom:22px; }
   .pyExoCard { display:flex; gap:12px; background:#0F1010; border:1px solid #202020; border-radius:12px; padding:12px; align-items:flex-start; }
   .pyExoImg { width:84px; height:84px; object-fit:contain; object-position:center; border-radius:8px; background:#f4f4f4; flex-shrink:0; }
@@ -145,13 +225,58 @@
   /* ---------- work screen ---------- */
   .workWrap { display:flex; flex-direction:column; align-items:center; flex:1; justify-content:center; padding:10px 0; }
   .supersetTag { font-size:11px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#0B0D0E; background:#FF6A3D; padding:4px 10px; border-radius:20px; margin-bottom:14px; }
-  .exoName { font-family:'Anton', sans-serif; font-size:32px; line-height:1.05; text-align:center; color:#39FF6A; margin-bottom:24px; text-transform:uppercase; letter-spacing:0.01em; }
+  .exoName { font-family:'Anton', sans-serif; font-size:26px !important; line-height:1.05; text-align:center; color:#39FF6A; margin-bottom:24px; text-transform:uppercase; letter-spacing:0.01em; }
+  .workWrap .exoName { font-size:26px !important; }
   .statRow { display:flex; gap:10px; margin-bottom:10px; }
   .statBox { background:#161717; border:1px solid #232323; border-radius:10px; padding:12px 18px; text-align:center; min-width:80px; }
   .statValue { font-size:22px; font-weight:800; font-variant-numeric: tabular-nums; }
   .statLabel { font-size:10px; color:#8A8A85; text-transform:uppercase; letter-spacing:0.06em; margin-top:2px; }
   .weightHint { font-size:12px; color:#8A8A85; margin-bottom:16px; }
   .supersetHint { font-size:12.5px; color:#D8D8D2; background:#161717; border:1px solid #2A2A2A; border-radius:10px; padding:10px 14px; margin-bottom:20px; max-width:300px; text-align:center; line-height:1.4; }
+  .videoBtnWrap { display:flex; justify-content:center; width:100%; margin: 0 0 12px; }
+  .videoBtnWrap .pillBtn,
+  .videoActionBtn {
+    margin: 0 auto;
+    background: #0B0D0E !important;
+    color: #F5F5F0 !important;
+    border: 1px solid #2A2A2A !important;
+    border-radius: 999px;
+    padding: 8px 16px !important;
+    font-size: 12.5px !important;
+    font-weight: 400;
+    line-height: 1.3;
+    letter-spacing: 0;
+  }
+  .actionStack { display:flex; flex-direction:column; align-items:center; gap:12px; width:100%; margin-top:8px; }
+  .actionStack .pillBtn { margin:0; }
+  .supersetActionStack {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:18px;
+    width:100%;
+    margin-top:18px;
+    min-height: 120px;
+    padding: 2px 0;
+  }
+  .supersetActionStack > .videoActionBtn,
+  .supersetActionStack > .pauseBtn,
+  .supersetActionStack > .pillBtn {
+    margin:0;
+    width: auto;
+    text-align:center;
+  }
+  .supersetActionStack .videoActionBtn {
+    background: #0B0D0E !important;
+    color: #F5F5F0 !important;
+    border: 1px solid #2A2A2A !important;
+    border-radius: 999px;
+    padding: 8px 16px !important;
+    font-size: 12.5px !important;
+    font-weight: 400;
+    line-height: 1.3;
+    letter-spacing: 0;
+  }
 
   /* ---------- rest screen ---------- */
   .restWrap { display:flex; flex-direction:column; align-items:center; flex:1; justify-content:center; }
@@ -167,6 +292,7 @@
   .ratingBtn.selected { border-color:#F5F5F0; transform: scale(1.08); }
   .circleBtn { width:58px; height:58px; border-radius:50%; background:#39FF6A; border:none; display:flex; align-items:center; justify-content:center; font-size:22px; }
   .skipBtn { display:flex; align-items:center; gap:6px; background:transparent; border:1px solid #2A2A2A; color:#B9B9B4; border-radius:999px; padding:8px 16px; font-size:12.5px; font-family:'Inter',sans-serif; }
+  .skipBtn.finishBtn { background:#39FF6A; color:#0B0D0E; border:none; font-weight:700; padding:12px 28px; font-size:15px; }
 
   /* ---------- done screen ---------- */
   .doneWrap { display:flex; flex-direction:column; align-items:center; justify-content:center; flex:1; text-align:center; gap:10px; }
@@ -278,12 +404,18 @@
 <div class="app">
   <div class="tabs">
     <button class="tab-btn active" data-tab="seance">Séance</button>
-    <button class="tab-btn" data-tab="config">⚙ Configuration</button>
+    <button class="tab-btn" data-tab="config">⚙ 5 Costauds</button>
+    <button class="tab-btn" data-tab="history">Historique</button>
   </div>
 
   <!-- ============ ONGLET SÉANCE ============ -->
   <div class="panel active" id="panel-seance">
     <div class="card" id="seance-card"></div>
+  </div>
+
+  <!-- ============ ONGLET HISTORIQUE ============ -->
+  <div class="panel" id="panel-history">
+    <div class="card" id="history-card"></div>
   </div>
 
   <!-- ============ ONGLET CONFIGURATION ============ -->
@@ -353,8 +485,8 @@
   const DEFAULT_SUPERSET = {
   rounds: 3,
   rest: 90,
-  a: { name: "Curl haltère", reps: 13, weight: 13.6 },
-  b: { name: "Extension haltère", reps: 13, weight: 13.6 },
+  a: { name: "Curl haltères", reps: 13, weight: 13.6 },
+  b: { name: "Extension haltères", reps: 13, weight: 13.6 },
 };
 
 const EXERCISE_VIDEOS = {
@@ -362,8 +494,8 @@ const EXERCISE_VIDEOS = {
   "SDT haltères": "https://youtu.be/QzpzuZu9JaA",
   "Développé couché haltères": "https://youtu.be/3ckOOdyskXQ",
   "Rowing bûcheron": "https://youtu.be/zK_rElx-lg8",
-  "Curl haltère": "https://youtu.be/ewaL-R2y7_M",
-  "Extension haltère": "https://youtu.be/-Q8TxvtmN4k"
+  "Curl haltères": "https://youtu.be/ewaL-R2y7_M",
+  "Extension haltères": "https://youtu.be/-Q8TxvtmN4k"
 };
 
 let EXO = clone(DEFAULT_EXO);
@@ -440,6 +572,7 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
 
   let fileHandle = null;
   let fileStatusMode = "none"; // none | linked | locked
+  let HISTORY = [];
 
   function idbOpen() {
     return new Promise((resolve, reject) => {
@@ -472,17 +605,45 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
     } catch (e) { /* ignore */ }
   }
 
+  function normalizeSupersetNames() {
+    const normalizeSingle = (name) => {
+      if (!name || typeof name !== "string") return name;
+      return name
+        .replace(/\bCurl haltère\b/gi, "Curl haltères")
+        .replace(/\bExtension haltère\b/gi, "Extension haltères")
+        .replace(/\bCurl haltere\b/gi, "Curl haltères")
+        .replace(/\bExtension haltere\b/gi, "Extension haltères")
+        .replace(/\bhaltère\b/gi, "haltères")
+        .replace(/\bhaltere\b/gi, "haltères");
+    };
+
+    if (SUPERSET && SUPERSET.a && typeof SUPERSET.a.name === "string") {
+      SUPERSET.a.name = normalizeSingle(SUPERSET.a.name);
+    }
+    if (SUPERSET && SUPERSET.b && typeof SUPERSET.b.name === "string") {
+      SUPERSET.b.name = normalizeSingle(SUPERSET.b.name);
+    }
+  }
+
   function currentConfigObject() {
-    return { program: "5 Costauds", exo: EXO, superset: SUPERSET, savedAt: new Date().toISOString() };
+    return { program: "5 Costauds", exo: EXO, superset: SUPERSET, history: HISTORY, savedAt: new Date().toISOString() };
   }
   function applyConfigObject(cfg) {
     if (!cfg || !Array.isArray(cfg.exo) || !cfg.superset) return false;
     EXO = cfg.exo;
     SUPERSET = cfg.superset;
+    normalizeSupersetNames();
+    HISTORY = Array.isArray(cfg.history) ? cfg.history : [];
     return true;
   }
   function saveToLocalStorage() {
     try { localStorage.setItem(LS_KEY, JSON.stringify(currentConfigObject())); } catch (e) { /* ignore */ }
+  }
+  function persistHistoryState() {
+    saveToLocalStorage();
+    if (fileHandle) {
+      writeToLinkedFile();
+    }
   }
   function loadFromLocalStorage() {
     try {
@@ -651,7 +812,9 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
     }
     STEPS.push({ type: "done" });
 
-    BLOCKS = EXO.map((ex) => ({ label: ex.name })).concat([{ label: `${SUPERSET.a.name} / ${SUPERSET.b.name}` }]);
+    BLOCKS = EXO.map((ex) => ({ label: ex.name })).concat([{
+      label: `${(SUPERSET.a.name || "").toUpperCase()} / ${(SUPERSET.b.name || "").toUpperCase()}`
+    }]);
 
     BLOCK_OF_STEP = STEPS.map((s) => {
       if (s.type === "done") return BLOCKS.length - 1;
@@ -679,6 +842,7 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
     ratings[BLOCKS.length - 1] = { a: null, b: null };
     state = {
       started: false,
+      timerStarted: false,
       i: 0,
       running: false,
       secondsLeft: STEPS[0] && STEPS[0].type === "rest" ? STEPS[0].duration : 0,
@@ -686,6 +850,7 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
       workElapsed: 0,
       restElapsed: 0,
       blockElapsed: Array(BLOCKS.length).fill(0),
+      sessionStartedAt: null,
       ratings,
       totalTimer: null,
       restTimer: null,
@@ -693,8 +858,94 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
     renderSeance();
   }
 
+  function handleEnterShortcut() {
+    const activeTag = document.activeElement && document.activeElement.tagName;
+    if (activeTag === "INPUT" || activeTag === "TEXTAREA" || activeTag === "SELECT" || activeTag === "BUTTON") {
+      return;
+    }
+
+    const pyramidBtn = document.getElementById("pyramide-chrono-btn");
+    if (pyramidBtn) {
+      if (!pyramideChrono.started) {
+        togglePyramideChrono();
+        return;
+      }
+      if (pyramideChrono.running) {
+        nextPyramideLevel();
+        return;
+      }
+      return;
+    }
+
+    const sessionPauseBtn = document.getElementById("pause-btn");
+    if (!sessionPauseBtn) {
+      const startBtn = document.getElementById("start-btn");
+      if (startBtn) {
+        handleStart();
+      }
+      return;
+    }
+
+    if (!state.started) {
+      handleStart();
+      return;
+    }
+
+    if (!state.timerStarted) {
+      togglePause();
+      return;
+    }
+
+    if (!state.running) return;
+
+    const step = STEPS[state.i];
+    if (!step) return;
+    if (step.type === "work" || step.type === "rest") {
+      next();
+    }
+  }
+
+  function handleSpaceShortcut() {
+    const activeTag = document.activeElement && document.activeElement.tagName;
+    if (activeTag === "INPUT" || activeTag === "TEXTAREA" || activeTag === "SELECT" || activeTag === "BUTTON") {
+      return;
+    }
+
+    const pyramidBtn = document.getElementById("pyramide-chrono-btn");
+    if (pyramidBtn) {
+      if (pyramideChrono.started && !document.body.classList.contains("done-view")) {
+        togglePyramideChrono();
+      }
+      return;
+    }
+
+    const sessionPauseBtn = document.getElementById("pause-btn");
+    if (sessionPauseBtn && state.started && state.timerStarted) {
+      togglePause();
+    }
+  }
+
+  document.addEventListener("keydown", (event) => {
+    const isSpace = event.key === " " || event.code === "Space" || event.key === "Spacebar";
+    const activeTag = document.activeElement && document.activeElement.tagName;
+    if (activeTag === "INPUT" || activeTag === "TEXTAREA" || activeTag === "SELECT" || activeTag === "BUTTON") {
+      return;
+    }
+
+    if (isSpace) {
+      event.preventDefault();
+      handleSpaceShortcut();
+      return;
+    }
+
+    if (event.key !== "Enter") return;
+    event.preventDefault();
+    handleEnterShortcut();
+  });
+
   /* ---------------- Pyramide / FatBurner 6 : chrono libre + liste d'exercices ---------------- */
-  let pyramideChrono = { seconds: 0, running: false, timer: null, levelTimes: [], lastMark: 0 };
+  let pyramideChrono = { seconds: 0, running: false, timer: null, levelTimes: [], lastMark: 0, started: false };
+  let pyramidHistoryRecorded = false;
 
   const PYRAMIDE_LEVELS = [1,2,3,4,5,6,7,8,9,10,9,8,7,6,5,4,3,2,1];
   const FATBURNER6_LEVELS = [5,6,7,8,9,10,9,8,7,6,5];
@@ -724,8 +975,15 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
     if (prevBtn) prevBtn.disabled = pyramideLevelIdx === 0;
     if (nextBtn) {
       const isLast = pyramideLevelIdx === levels.length - 1;
-      nextBtn.textContent = isLast ? "✓ terminer" : "niveau suivant ▸";
-      nextBtn.disabled = false;
+      nextBtn.innerHTML = isLast ? "✓ terminer" : "niveau suivant <span class='arrow'>▶</span>";
+      const isActive = pyramideChrono.running;
+      nextBtn.classList.toggle("active", isActive);
+      nextBtn.disabled = !isActive;
+      nextBtn.style.pointerEvents = isActive ? "auto" : "none";
+      nextBtn.style.opacity = isActive ? "1" : "0.35";
+      nextBtn.style.background = isActive ? "#39FF6A" : "rgba(57, 255, 106, 0.12)";
+      nextBtn.style.color = isActive ? "#0B0D0E" : "rgba(245, 245, 240, 0.8)";
+      nextBtn.style.borderColor = isActive ? "#39FF6A" : "rgba(57, 255, 106, 0.18)";
     }
   }
 
@@ -759,7 +1017,22 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
     if (el) el.textContent = formatChrono(pyramideChrono.seconds);
   }
 
+  function updatePyramideChronoButton() {
+    const btn = document.getElementById("pyramide-chrono-btn");
+    if (!btn) return;
+    if (pyramideChrono.running) {
+      btn.textContent = "⏸ pause séance";
+      btn.style.background = "#FF3B3B";
+      btn.style.color = "#F5F5F0";
+      return;
+    }
+    btn.textContent = pyramideChrono.seconds > 0 ? "▶ reprendre" : "▶ démarrer";
+    btn.style.background = "#39FF6A";
+    btn.style.color = "#0B0D0E";
+  }
+
   function togglePyramideChrono() {
+    if (!pyramideChrono.started) pyramideChrono.started = true;
     pyramideChrono.running = !pyramideChrono.running;
     if (pyramideChrono.running) {
       pyramideChrono.timer = setInterval(() => {
@@ -770,18 +1043,20 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
       clearInterval(pyramideChrono.timer);
       pyramideChrono.timer = null;
     }
-    const btn = document.getElementById("pyramide-chrono-btn");
-    if (btn) btn.textContent = pyramideChrono.running ? "⏸ pause" : "▶ démarrer";
+    updatePyramideChronoButton();
+    updateLevelDisplay();
   }
 
   function renderPyramideDone() {
+    if (!pyramidHistoryRecorded) {
+      appendPyramidHistory();
+      pyramidHistoryRecorded = true;
+    }
     const total = formatChrono(pyramideChrono.seconds);
     const rows = currentPyramidConfig.levels.map((lvl,i)=>`<div class="recapRow ${i%2?'stripe':''}"><span>Niveau ${lvl}</span><span></span><span class="recapValue">${formatChrono(pyramideChrono.levelTimes[i]||0)}</span></div>`).join('');
     cardEl.innerHTML = `<div class="doneWrap"><div class="doneTitle">${currentPyramidConfig.doneTitle}</div><div class="recapBox"><div class="recapTotalRow"><div class="recapTotalLabel">Temps total</div><div class="recapTotalValue">${total}</div></div><div class="recapDivider"></div><div class="recapTable">${rows}</div></div><button class="btn restartBtn" id="pyramide-restart">↺ Recommencer</button></div>`;
     document.getElementById('pyramide-restart').onclick = () => {
-      pyramideChrono = { seconds: 0, running: false, timer: null, levelTimes: Array(currentPyramidConfig.levels.length).fill(0), lastMark: 0 };
-      pyramideLevelIdx = 0;
-      renderPyramidWorkout(currentPyramidConfig);
+      goToMainMenu();
     };
   }
 
@@ -794,9 +1069,11 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
 
   function renderPyramidWorkout(config) {
     currentPyramidConfig = { ...config, levels: [...config.levels], exos: config.exos };
+    pyramidHistoryRecorded = false;
     pyramideChrono.seconds = 0;
     pyramideChrono.running = false;
     pyramideChrono.lastMark = 0;
+    pyramideChrono.started = false;
     pyramideChrono.levelTimes = Array(currentPyramidConfig.levels.length).fill(0);
     pyramideLevelIdx = 0;
     clearInterval(pyramideChrono.timer);
@@ -819,7 +1096,10 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
     cardEl.innerHTML = `
       <div class="pyWrap">
         <div class="pyHeader">
-          <div class="pyTitle">${config.title}</div>
+          <div class="pyTitleRow">
+            <span class="pyTitleIcon">🏋️</span>
+            <div class="pyTitle">${config.title}</div>
+          </div>
           <div class="pySub">${config.subtitle}</div>
         </div>
         <div class="pyLevelBox">
@@ -832,11 +1112,11 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
             </div>
             <div class="pyLevelSpacer"></div>
           </div>
-          <button class="btn pillBtn pyLevelNextBtn" id="pyramide-level-next"></button>
-        </div>
-        <div class="pyChronoBox">
           <div class="pyChronoValue" id="pyramide-chrono-value">${formatChrono(pyramideChrono.seconds)}</div>
-          <button class="btn pillBtn" id="pyramide-chrono-btn">${pyramideChrono.running ? "⏸ pause" : "▶ démarrer"}</button>
+          <div class="pyActionRow">
+            <button class="btn pillBtn pyLevelNextBtn" id="pyramide-level-next"></button>
+            <button class="btn pillBtn pyChronoBtn" id="pyramide-chrono-btn" style="background:${pyramideChrono.running ? "#FF3B3B" : "#39FF6A"}; color:${pyramideChrono.running ? "#F5F5F0" : "#0B0D0E"};">${pyramideChrono.running ? "⏸ pause séance" : (pyramideChrono.seconds > 0 ? "▶ reprendre" : "▶ démarrer")}</button>
+          </div>
         </div>
         <div class="pyExoList">${exosHtml}</div>
       </div>`;
@@ -875,7 +1155,16 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
     startRestTimerIfNeeded();
     renderSeance();
   }
-  function next() { if (state.i < STEPS.length - 1) goTo(state.i + 1); }
+  function next() {
+    const nextIndex = state.i + 1;
+    if (state.i < STEPS.length - 1) {
+      const isFinishingWorkout = nextIndex >= STEPS.length - 1 && STEPS[nextIndex] && STEPS[nextIndex].type === "done";
+      if (isFinishingWorkout) {
+        appendSessionHistory();
+      }
+      goTo(nextIndex);
+    }
+  }
   function prev() { if (state.i > 0) goTo(state.i - 1); }
 
   function startTotalTimer() {
@@ -914,7 +1203,13 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
 
   function togglePause() {
     getAudioCtx();
+    const shouldStart = !state.running;
     state.running = !state.running;
+    if (shouldStart) {
+      state.timerStarted = true;
+      state.sessionStartedAt = new Date().toISOString();
+      startTotalTimer();
+    }
     startRestTimerIfNeeded();
     renderSeance();
   }
@@ -922,13 +1217,206 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
   function handleStart() {
     getAudioCtx();
     state.started = true;
-    state.running = true;
-    startTotalTimer();
-    startRestTimerIfNeeded();
+    state.running = false;
+    state.timerStarted = false;
+    state.sessionStartedAt = null;
     renderSeance();
   }
 
-  function handleRestart() { resetSession(); }
+  function getSessionPauseButtonLabel() {
+    if (state.running) return "⏸ pause séance";
+    if (state.timerStarted) return "▶ reprendre";
+    return "▶ démarrer";
+  }
+
+  function formatHistoryDuration(seconds) {
+    const total = Math.max(0, Math.round(seconds || 0));
+    const m = Math.floor(total / 60);
+    const s = total % 60;
+    return `${m}:${String(s).padStart(2, "0")}`;
+  }
+
+  function formatFullDateTime(isoString) {
+    if (!isoString) return "—";
+    const date = new Date(isoString);
+    if (Number.isNaN(date.getTime())) return "—";
+    return new Intl.DateTimeFormat("fr-FR", { dateStyle: "short", timeStyle: "short" }).format(date);
+  }
+
+  function makeHistoryRecord(name, seconds, startAt = new Date(), details = [], effort = null) {
+    const cleanSeconds = Math.max(0, Math.round(seconds || 0));
+    const start = new Date(startAt);
+    const normalizedDetails = Array.isArray(details) ? details.map((d) => ({
+      name: d.name,
+      seconds: Math.max(0, Math.round(d.seconds || 0)),
+      effort: d.effort != null ? d.effort : null,
+      sub: Array.isArray(d.sub) ? d.sub.map((s) => ({
+        name: s.name,
+        effort: s.effort != null ? s.effort : null
+      })) : []
+    })) : [];
+    return {
+      id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      name,
+      seconds: cleanSeconds,
+      startedAt: start.toISOString(),
+      recordedAt: start.toISOString(),
+      date: start.toLocaleDateString("fr-FR"),
+      time: start.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", hour12: false }),
+      details: normalizedDetails,
+      effort
+    };
+  }
+
+  function buildWorkoutRecapDetails() {
+    const details = BLOCKS.map((block, idx) => {
+      const isSuperset = idx === BLOCKS.length - 1;
+      const elapsed = Math.max(0, Math.round(state.blockElapsed[idx] || 0));
+      const item = { name: block.label, seconds: elapsed };
+      if (isSuperset) {
+        const r = state.ratings[idx] || {};
+        item.sub = [
+          { name: SUPERSET.a.name, effort: r.a != null ? r.a : null },
+          { name: SUPERSET.b.name, effort: r.b != null ? r.b : null }
+        ];
+      } else if (state.ratings[idx] != null) {
+        item.effort = state.ratings[idx];
+      }
+      return item;
+    });
+    return details;
+  }
+
+  function buildPyramidRecapDetails() {
+    return currentPyramidConfig.levels.map((lvl, idx) => ({
+      name: `Niveau ${lvl}`,
+      seconds: Math.max(0, Math.round(pyramideChrono.levelTimes[idx] || 0))
+    }));
+  }
+
+  function appendSessionHistory() {
+    const total = Math.max(0, Math.round(state.totalElapsed || 0));
+    if (!total) return;
+    const startedAt = state.sessionStartedAt ? new Date(state.sessionStartedAt) : new Date(Date.now() - total * 1000);
+    const details = buildWorkoutRecapDetails();
+    const record = makeHistoryRecord("5 Costauds · séance complète", total, startedAt, details, state.ratings);
+    HISTORY = [...HISTORY, record];
+    persistHistoryState();
+  }
+
+  function appendPyramidHistory() {
+    const total = Math.max(0, Math.round(pyramideChrono.seconds || 0));
+    if (!total) return;
+    const startedAt = new Date(Date.now() - total * 1000);
+    const details = buildPyramidRecapDetails();
+    const record = makeHistoryRecord(`${currentPyramidConfig.title}`, total, startedAt, details, null);
+    HISTORY = [...HISTORY, record];
+    persistHistoryState();
+  }
+
+  function deleteHistoryEntry(id) {
+    if (!window.confirm("Supprimer cet historique ?")) return;
+    if (!window.confirm("Confirmer la suppression définitive ?")) return;
+    HISTORY = HISTORY.filter((item) => item.id !== id);
+    persistHistoryState();
+    renderHistoryPage();
+  }
+
+  function deleteAllHistory() {
+    if (!window.confirm("Supprimer tout l'historique ?")) return;
+    if (!window.confirm("Confirmer définitivement la suppression de tout l'historique ?")) return;
+    HISTORY = [];
+    persistHistoryState();
+    renderHistoryPage();
+  }
+
+  function showHistoryDetails(id) {
+    const item = HISTORY.find((entry) => entry.id === id);
+    if (!item) return;
+    const details = Array.isArray(item.details) && item.details.length ? item.details : [{ name: item.name, seconds: item.seconds }];
+    const modal = document.createElement("div");
+    modal.className = "historyModal";
+    const detailRows = details.map((d) => {
+      const subRows = Array.isArray(d.sub) && d.sub.length
+        ? d.sub.map((s) => `<div class="historyModalRow sub"><span>↳ ${s.name}</span><strong>${s.effort != null ? `${s.effort}/10` : "—"}</strong></div>`).join("")
+        : "";
+      const effortCell = d.effort != null ? `<span>${d.effort}/10</span>` : "";
+      return `
+        <div class="historyModalBlock">
+          <div class="historyModalRow"><span>${d.name}</span><strong>${formatHistoryDuration(d.seconds)}</strong>${effortCell ? `<strong>${effortCell}</strong>` : ""}</div>
+          ${subRows}
+        </div>
+      `;
+    }).join("");
+    modal.innerHTML = `
+      <div class="historyModalCard">
+        <div class="historyModalTitle">${item.name}</div>
+        <div class="historyModalMeta">${new Date(item.startedAt || item.recordedAt).toLocaleDateString("fr-FR")} ${new Date(item.startedAt || item.recordedAt).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", hour12: false })}</div>
+        <div class="historyModalList">
+          ${detailRows}
+        </div>
+        <div class="historyModalTotal"><span>Total</span><strong>${formatHistoryDuration(item.seconds)}</strong></div>
+        <button class="btn historyCloseBtn">Fermer</button>
+      </div>
+    `;
+    modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+    modal.querySelector(".historyCloseBtn").onclick = () => modal.remove();
+    document.body.appendChild(modal);
+  }
+
+  function renderHistoryPage() {
+    const target = document.getElementById("history-card") || cardEl;
+    const entries = [...HISTORY].sort((a, b) => new Date(b.startedAt || b.recordedAt) - new Date(a.startedAt || a.recordedAt));
+    const rows = entries.length
+      ? entries.map((item) => {
+          const started = item.startedAt ? new Date(item.startedAt) : new Date(item.recordedAt || Date.now());
+          const date = started.toLocaleDateString("fr-FR");
+          const time = started.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", hour12: false });
+          return `
+        <div class="historyItem">
+          <div class="historyName">${item.name}</div>
+          <div class="historyDetail">${date} ${time}</div>
+          <div class="historyTime">${formatHistoryDuration(item.seconds)}</div>
+          <div class="historyActionsInline">
+            <button class="btn historyDetailBtn" data-id="${item.id}">Détails</button>
+            <button class="btn historyDeleteBtn" data-id="${item.id}">Supprimer</button>
+          </div>
+        </div>`;
+        }).join("")
+      : `<div class="historyEmpty">Aucun historique enregistré pour le moment.</div>`;
+
+    target.innerHTML = `
+      <div class="historyPage">
+        <div class="historyHeader">
+          <div class="startTitle">Historique</div>
+          <div class="historyMeta">${entries.length} temps enregistrés</div>
+        </div>
+        <div class="historyList">${rows}</div>
+        <div class="historyActions">
+          <button class="btn historyClearBtn" id="history-clear-all">Tout supprimer</button>
+        </div>
+        <div class="historyActions">
+          <button class="btn historyBackBtn" id="history-back-btn">← retour</button>
+        </div>
+      </div>`;
+
+    document.getElementById("history-back-btn").onclick = () => { document.querySelector('.tab-btn[data-tab="seance"]').click(); };
+    document.getElementById("history-clear-all").onclick = deleteAllHistory;
+    target.querySelectorAll(".historyDetailBtn").forEach((btn) => {
+      btn.onclick = () => showHistoryDetails(btn.dataset.id);
+    });
+    target.querySelectorAll(".historyDeleteBtn").forEach((btn) => {
+      btn.onclick = () => deleteHistoryEntry(btn.dataset.id);
+    });
+  }
+
+  function goToMainMenu() {
+    if (pyramideChrono.timer) clearInterval(pyramideChrono.timer);
+    pyramideChrono = { seconds: 0, running: false, timer: null, levelTimes: [], lastMark: 0, started: false };
+    resetSession();
+  }
+
+  function handleRestart() { goToMainMenu(); }
 
   /* ---------------- estimation kcal ---------------- */
   const MET_WORK = 5.5;
@@ -1133,30 +1621,39 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
             <div class="startIconWrap">🏋️</div>
             <div class="startTitle">5 Costauds</div>
             <div class="startSub">${EXO.length} exercices + l'enchaînement ${SUPERSET.a.name.toLowerCase()} / ${SUPERSET.b.name.toLowerCase()} · ${totalWork} séries au total</div>
-            <button class="btn pillBtn" id="start-btn">▶ commencer</button>
+            <button type="button" class="btn pillBtn pyChronoBtn" id="start-btn" style="background:#39FF6A; color:#0B0D0E;">▶ commencer</button>
           </div>
           <div class="exoStartBlock">
             <div class="startTitle">Pyramide</div>
             <div class="startSub">5 exercices en pyramide du niveau 1 au 10</div>
-            <button class="btn pillBtn" id="start-pyramide-btn">▶ commencer</button>
+            <button type="button" class="btn pillBtn" id="start-pyramide-btn">▶ commencer</button>
           </div>
-          <div class="exoStartBlock exoStartBlock--last">
+          <div class="exoStartBlock">
             <div class="startTitle">FatBurner 6</div>
             <div class="startSub">6 exercices en pyramide du niveau 5 au 10</div>
-            <button class="btn pillBtn" id="start-fatburner6-btn">▶ commencer</button>
+            <button type="button" class="btn pillBtn" id="start-fatburner6-btn">▶ commencer</button>
           </div>
           <div class="startHint">le chrono démarre à l'appui sur commencer, et tourne en continu jusqu'à la fin</div>
         </div>`;
-      document.getElementById("start-btn").onclick = handleStart;
-      document.getElementById("start-pyramide-btn").onclick = () => {
+      document.getElementById("start-btn").onclick = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        handleStart();
+      };
+      document.getElementById("start-pyramide-btn").onclick = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
         renderPyramide("Pyramide", "5 exercices en pyramide du niveau 1 au 10");
       };
-      document.getElementById("start-fatburner6-btn").onclick = () => {
+      document.getElementById("start-fatburner6-btn").onclick = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
         renderFatBurner6();
       };
       return;
     }
 
+    const showGlobalPause = step.type !== "done" && step.type !== "work";
     let html = `
       <div class="topBar" id="topBar"></div>
       ${step.type !== "done" ? `
@@ -1167,10 +1664,10 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
       <div class="progressBarWrap" id="progressBar"></div>
       <div id="upNext" class="upNext"></div>
       <div id="stepBody"></div>
-      ${step.type !== "done" ? `
+      ${showGlobalPause ? `
       <div class="bottomBar">
         <button class="btn pauseBtn" id="pause-btn" style="background:${state.running ? "#FF3B3B" : "#39FF6A"}; color:${state.running ? "#F5F5F0" : "#0B0D0E"}">
-          ${state.running ? "⏸ pause séance" : "▶ reprendre"}
+          ${getSessionPauseButtonLabel()}
         </button>
       </div>` : ""}
     `;
@@ -1180,11 +1677,24 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
     if (step.type !== "done") {
       document.getElementById("prev-btn").onclick = prev;
       document.getElementById("next-btn").onclick = next;
-      document.getElementById("pause-btn").onclick = togglePause;
+      const pauseBtn = document.getElementById("pause-btn");
+      if (pauseBtn) pauseBtn.onclick = togglePause;
     }
     renderProgressBar();
     renderUpNext();
     renderStepBody();
+  }
+
+  function hasTimerBeenStarted() {
+    return state.timerStarted || pyramideChrono.started;
+  }
+
+  function confirmAndGoToMainMenu() {
+    if (hasTimerBeenStarted()) {
+      const confirmed = window.confirm("Le chrono est en cours. Cela arrêtera l'entraînement en cours avant de revenir au menu principal.");
+      if (!confirmed) return;
+    }
+    goToMainMenu();
   }
 
   function renderTopBar() {
@@ -1193,11 +1703,16 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
     const doneCount = STEPS.slice(0, state.i).reduce((sum, s) => sum + stepSeriesCount(s), 0);
     const totalWork = STEPS.reduce((sum, s) => sum + stepSeriesCount(s), 0);
     el.innerHTML = `
-      <div class="brandRow"><span style="color:#39FF6A;font-size:15px;">🏋️</span><span class="brandText">5 Costauds</span></div>
+      <button class="brandBtn" id="brand-home-btn" type="button">
+        <span style="color:#39FF6A;font-size:15px;">🏋️</span>
+        <span class="brandText">5 Costauds</span>
+      </button>
       <div class="topRight">
         <span class="globalTimer">⏱ ${formatTime(state.totalElapsed)}</span>
         <span class="counter">${doneCount}/${totalWork} séries</span>
       </div>`;
+    const homeBtn = document.getElementById("brand-home-btn");
+    if (homeBtn) homeBtn.onclick = confirmAndGoToMainMenu;
   }
 
   function renderProgressBar() {
@@ -1245,40 +1760,46 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
             <div class="statBox"><div class="statValue">${step.a.reps}</div><div class="statLabel">reps</div></div>
             <div class="statBox"><div class="statValue">${step.a.weight} kg</div><div class="statLabel">poids total</div></div>
           </div>
-          <div class="weightHint">
-  soit ${step.a.weight / 2} kg par haltère si tu en utilises deux
-</div>
+          ${step.a.name === "Extension haltères" ? "" : `<div class="weightHint">
+  soit ${step.a.weight / 2} kg par haltères si tu en utilises deux
+</div>`}
 
 ${EXERCISE_VIDEOS[step.a.name]
-  ? `<button
+  ? `<div class="videoBtnWrap"><button
        class="btn pillBtn"
-       style="margin-bottom:12px;"
        onclick="window.open('${EXERCISE_VIDEOS[step.a.name]}','_blank','noopener,noreferrer')">
        ▶  voir la vidéo
-     </button>`
+     </button></div>`
   : ""}
           <div class="supersetHint">Enchaîne directement avec ${step.b.name}, sans pause</div>
-          <div class="exoName" style="font-size:24px; margin-bottom:14px;">${step.b.name}</div>
+          <div class="exoName" style="margin-bottom:14px;">${step.b.name}</div>
           <div class="statRow">
             <div class="statBox"><div class="statValue">${step.setNum} / ${step.totalSets}</div><div class="statLabel">manche</div></div>
             <div class="statBox"><div class="statValue">${step.b.reps}</div><div class="statLabel">reps</div></div>
             <div class="statBox"><div class="statValue">${step.b.weight} kg</div><div class="statLabel">poids total</div></div>
           </div>
-          <div class="weightHint">
-  soit ${step.b.weight / 2} kg par haltère si tu en utilises deux
-</div>
+          ${step.b.name === "Extension haltères" ? "" : `<div class="weightHint">
+  soit ${step.b.weight / 2} kg par haltères si tu en utilises deux
+</div>`}
 
 ${EXERCISE_VIDEOS[step.b.name]
-  ? `<button
+  ? `<div class="videoBtnWrap"><button
        class="btn pillBtn"
-       style="margin-bottom:12px;"
        onclick="window.open('${EXERCISE_VIDEOS[step.b.name]}','_blank','noopener,noreferrer')">
        ▶  voir la vidéo
-     </button>`
+     </button></div>`
   : ""}
-          <button class="btn pillBtn" id="done-set-btn">✓ manche terminée</button>
+          <div class="supersetActionStack">
+            <button class="btn pillBtn" id="done-set-btn" ${state.running ? "" : "disabled"} style="background:${state.running ? "#39FF6A" : "rgba(57, 255, 106, 0.12)"}; color:${state.running ? "#0B0D0E" : "rgba(245, 245, 240, 0.8)"}; border:${state.running ? "none" : "1px solid rgba(57, 255, 106, 0.18)"}; cursor:${state.running ? "pointer" : "default"}; pointer-events:${state.running ? "auto" : "none"}; opacity:${state.running ? "1" : "0.35"};">
+              ✓ manche terminée
+            </button>
+            <button class="btn pauseBtn" id="pause-btn" style="background:${state.running ? "#FF3B3B" : "#39FF6A"}; color:${state.running ? "#F5F5F0" : "#0B0D0E"}">
+              ${getSessionPauseButtonLabel()}
+            </button>
+          </div>
         </div>`;
-      document.getElementById("done-set-btn").onclick = next;
+      if (state.running) document.getElementById("done-set-btn").onclick = next;
+      document.getElementById("pause-btn").onclick = togglePause;
     } else if (step.type === "work") {
       el.innerHTML = `
         <div class="workWrap">
@@ -1288,19 +1809,21 @@ ${EXERCISE_VIDEOS[step.b.name]
             <div class="statBox"><div class="statValue">${step.reps}</div><div class="statLabel">reps</div></div>
             <div class="statBox"><div class="statValue">${step.weight} kg</div><div class="statLabel">poids total</div></div>
           </div>
-          <div class="weightHint">soit ${step.weight / 2} kg par haltère si tu en utilises deux</div>
-          ${EXERCISE_VIDEOS[step.name]
-  ? `<button class="btn pillBtn" onclick="window.open('${EXERCISE_VIDEOS[step.name]}','_blank')">▶ voir la vidéo</button>`
+          ${step.name === "Extension haltères" ? "" : `<div class="weightHint">soit ${step.weight / 2} kg par haltères si tu en utilises deux</div>`}
+          <div class="actionStack">
+            ${EXERCISE_VIDEOS[step.name]
+  ? `<button class="btn pillBtn videoActionBtn" onclick="window.open('${EXERCISE_VIDEOS[step.name]}','_blank')">▶ voir la vidéo</button>`
   : ""}
-
-<button
-  class="btn pillBtn"
-  id="done-set-btn"
-  style="margin-top:12px;">
-  ✓ série terminée
-</button>
+            <button class="btn pillBtn" id="done-set-btn" ${state.running ? "" : "disabled"} style="background:${state.running ? "#39FF6A" : "rgba(57, 255, 106, 0.12)"}; color:${state.running ? "#0B0D0E" : "rgba(245, 245, 240, 0.8)"}; border:${state.running ? "none" : "1px solid rgba(57, 255, 106, 0.18)"}; cursor:${state.running ? "pointer" : "default"}; pointer-events:${state.running ? "auto" : "none"}; opacity:${state.running ? "1" : "0.35"};">
+              ✓ série terminée
+            </button>
+            <button class="btn pauseBtn" id="pause-btn" style="background:${state.running ? "#FF3B3B" : "#39FF6A"}; color:${state.running ? "#F5F5F0" : "#0B0D0E"}">
+              ${getSessionPauseButtonLabel()}
+            </button>
+          </div>
         </div>`;
-      document.getElementById("done-set-btn").onclick = next;
+      if (state.running) document.getElementById("done-set-btn").onclick = next;
+      document.getElementById("pause-btn").onclick = togglePause;
     } else if (step.type === "rest") {
       const blockIdx = BLOCK_OF_STEP[state.i];
       const weightChanged = step.nextName && step.currentWeight !== step.nextWeight;
@@ -1357,7 +1880,7 @@ ${EXERCISE_VIDEOS[step.b.name]
           </div>`) : ""}
           <div class="restBtnRow">
             ${noTimer ? "" : `<button class="btn circleBtn" id="rest-pause-btn"></button>`}
-            <button class="btn skipBtn" id="rest-skip-btn">${noTimer ? "✓ terminer la séance" : "⏭ passer le repos"}</button>
+            <button class="btn skipBtn ${noTimer ? 'finishBtn' : ''}" id="rest-skip-btn">${noTimer ? "✓ terminer la séance" : "⏭ passer le repos"}</button>
           </div>
         </div>`;
       if (!noTimer) document.getElementById("rest-pause-btn").onclick = togglePause;
@@ -1454,13 +1977,26 @@ ${EXERCISE_VIDEOS[step.b.name]
   }
 
   /* ---------------- Onglets ---------------- */
+  function activateTab(tabName) {
+    document.querySelectorAll(".tab-btn").forEach((b) => b.classList.toggle("active", b.dataset.tab === tabName));
+    document.querySelectorAll(".panel").forEach((p) => p.classList.toggle("active", p.id === `panel-${tabName}`));
+  }
+
   document.querySelectorAll(".tab-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
-      document.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"));
-      document.querySelectorAll(".panel").forEach((p) => p.classList.remove("active"));
-      btn.classList.add("active");
-      document.getElementById(`panel-${btn.dataset.tab}`).classList.add("active");
+      if (btn.dataset.tab === "seance") {
+        if (hasTimerBeenStarted()) {
+          const confirmed = window.confirm("Le chrono est en cours. Cela arrêtera l'entraînement en cours avant de revenir au menu principal.");
+          if (!confirmed) return;
+        }
+        goToMainMenu();
+        activateTab("seance");
+        return;
+      }
+
+      activateTab(btn.dataset.tab);
       if (btn.dataset.tab === "config") fillConfigForm();
+      if (btn.dataset.tab === "history") renderHistoryPage();
     });
   });
 
@@ -1639,6 +2175,7 @@ ${EXERCISE_VIDEOS[step.b.name]
       loadFromLocalStorage();
       updateFileStatus(fileHandle ? "locked" : "none");
     }
+    normalizeSupersetNames();
     resetSession();
     fillConfigForm();
   })();
