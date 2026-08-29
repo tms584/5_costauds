@@ -324,7 +324,9 @@ const EXERCISE_VIDEOS = {
   "Squats haltères": "https://youtu.be/K2eS6QjK1-w",
   "SDT haltères": "https://youtu.be/QzpzuZu9JaA",
   "Développé couché haltères": "https://youtu.be/3ckOOdyskXQ",
-  "Rowing bûcheron": "https://youtu.be/zK_rElx-lg8"
+  "Rowing bûcheron": "https://youtu.be/zK_rElx-lg8",
+  "Curl haltère": "https://youtu.be/ewaL-R2y7_M",
+  "Extension haltère": "https://youtu.be/-Q8TxvtmN4k"
 };
 
 let EXO = clone(DEFAULT_EXO);
@@ -833,7 +835,18 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
             <div class="statBox"><div class="statValue">${step.a.reps}</div><div class="statLabel">reps</div></div>
             <div class="statBox"><div class="statValue">${step.a.weight} kg</div><div class="statLabel">poids total</div></div>
           </div>
-          <div class="weightHint">soit ${step.a.weight / 2} kg par haltère si tu en utilises deux</div>
+          <div class="weightHint">
+  soit ${step.a.weight / 2} kg par haltère si tu en utilises deux
+</div>
+
+${EXERCISE_VIDEOS[step.a.name]
+  ? `<button
+       class="btn pillBtn"
+       style="margin-bottom:12px;"
+       onclick="window.open('${EXERCISE_VIDEOS[step.a.name]}','_blank','noopener,noreferrer')">
+       ▶ Voir la vidéo
+     </button>`
+  : ""}
           <div class="supersetHint">Enchaîne directement avec ${step.b.name}, sans pause</div>
           <div class="exoName" style="font-size:24px; margin-bottom:14px;">${step.b.name}</div>
           <div class="statRow">
@@ -841,7 +854,18 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
             <div class="statBox"><div class="statValue">${step.b.reps}</div><div class="statLabel">reps</div></div>
             <div class="statBox"><div class="statValue">${step.b.weight} kg</div><div class="statLabel">poids total</div></div>
           </div>
-          <div class="weightHint">soit ${step.b.weight / 2} kg par haltère si tu en utilises deux</div>
+          <div class="weightHint">
+  soit ${step.b.weight / 2} kg par haltère si tu en utilises deux
+</div>
+
+${EXERCISE_VIDEOS[step.b.name]
+  ? `<button
+       class="btn pillBtn"
+       style="margin-bottom:12px;"
+       onclick="window.open('${EXERCISE_VIDEOS[step.b.name]}','_blank','noopener,noreferrer')">
+       ▶ Voir la vidéo
+     </button>`
+  : ""}
           <button class="btn pillBtn" id="done-set-btn">✓ manche terminée</button>
         </div>`;
       document.getElementById("done-set-btn").onclick = next;
