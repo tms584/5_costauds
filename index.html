@@ -921,15 +921,17 @@
               if (sub) state.ratings[blockIdx][sub] = val;
               else state.ratings[blockIdx] = val;
               renderStepBody();
-              document
-        .querySelectorAll(".rating-help-btn")
-        .forEach(btn => {
-          btn.onclick = showRatingHelp;
-        });
-            };
+             };
           });
         });
       }
+      if (step.rating) {
+  document
+    .querySelectorAll(".rating-help-btn")
+    .forEach(btn => {
+      btn.onclick = showRatingHelp;
+    });
+    }
       if (!noTimer) renderRestRing();
     } else if (step.type === "done") {
       const kcalBoxId = "weight-input";
