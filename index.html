@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="5 Costauds" />
+<meta name="apple-mobile-web-app-title" content="PIS sport" />
 <meta name="theme-color" content="#0B0D0E" />
-<link rel="icon" type="image/svg+xml" href="app-icon.svg" />
-<link rel="apple-touch-icon" href="app-icon.svg" />
-<link rel="apple-touch-icon" sizes="180x180" href="app-icon.svg" />
+<link rel="icon" type="image/png" href="app-icon.png" />
+<link rel="apple-touch-icon" href="app-icon.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="app-icon.png" />
 <link rel="manifest" href="manifest.webmanifest" />
 <title>PIS sport</title>
 <style>
@@ -584,14 +584,29 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
   function normalizeNumericInput(value) {
     if (value === null || value === undefined) return null;
-    const normalized = String(value).trim().replace(/,/g, ".");
+    let normalized = String(value).trim().replace(/\s+/g, "");
+    if (!normalized) return null;
+
+    normalized = normalized.replace(/\./g, ",");
+    normalized = normalized.replace(/,+/g, ",");
+
+    const parts = normalized.split(",");
+    if (parts.length > 2) {
+      const whole = parts.shift() || "";
+      const fraction = parts.join("");
+      normalized = `${whole},${fraction}`;
+    }
+
+    if (normalized === ",") return null;
+    if (normalized.startsWith(",")) normalized = normalized.slice(1);
+    if (normalized.endsWith(",")) normalized = normalized.slice(0, -1);
     if (!normalized || normalized === ".") return null;
     return normalized;
   }
   function safeNumber(value, fallback = 0) {
     const normalized = normalizeNumericInput(value);
     if (normalized === null) return fallback;
-    const parsed = Number(normalized);
+    const parsed = Number(normalized.replace(",", "."));
     return Number.isFinite(parsed) ? parsed : fallback;
   }
   function formatTime(s) {
@@ -2147,12 +2162,12 @@ ${EXERCISE_VIDEOS[step.b.name]
           <div class="field full"><label>Nom</label><input type="text" data-idx="${idx}" data-key="name" class="exo-input" value="${ex.name}" /></div>
         </div>
         <div class="fieldRow">
-          <div class="field"><label>Séries</label><input type="text" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" min="1" data-idx="${idx}" data-key="sets" class="exo-input" value="${ex.sets}" /></div>
-          <div class="field"><label>Répétitions</label><input type="text" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" min="0" data-idx="${idx}" data-key="reps" class="exo-input" value="${ex.reps}" /></div>
+          <div class="field"><label>Séries</label><input type="text" inputmode="decimal" pattern="[0-9]*[,]?[0-9]*" min="1" data-idx="${idx}" data-key="sets" class="exo-input" value="${ex.sets}" /></div>
+          <div class="field"><label>Répétitions</label><input type="text" inputmode="decimal" pattern="[0-9]*[,]?[0-9]*" min="0" data-idx="${idx}" data-key="reps" class="exo-input" value="${ex.reps}" /></div>
         </div>
         <div class="fieldRow">
-          <div class="field"><label>Poids total (kg)</label><input type="text" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" min="0" step="0.5" data-idx="${idx}" data-key="weight" class="exo-input" value="${ex.weight}" /></div>
-          <div class="field"><label>Récup' (s)</label><input type="text" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" min="0" data-idx="${idx}" data-key="rest" class="exo-input" value="${ex.rest}" /></div>
+          <div class="field"><label>Poids total (kg)</label><input type="text" inputmode="decimal" pattern="[0-9]*[,]?[0-9]*" min="0" step="0.5" data-idx="${idx}" data-key="weight" class="exo-input" value="${ex.weight}" /></div>
+          <div class="field"><label>Récup' (s)</label><input type="text" inputmode="decimal" pattern="[0-9]*[,]?[0-9]*" min="0" data-idx="${idx}" data-key="rest" class="exo-input" value="${ex.rest}" /></div>
         </div>
       </div>
     `).join("");
@@ -2165,6 +2180,22 @@ ${EXERCISE_VIDEOS[step.b.name]
     document.getElementById("ssB-name").value = SUPERSET.b.name;
     document.getElementById("ssB-reps").value = SUPERSET.b.reps;
     document.getElementById("ssB-weight").value = SUPERSET.b.weight;
+
+    document.querySelectorAll('input[inputmode="decimal"]').forEach((input) => {
+      const sanitize = () => {
+        const value = normalizeNumericInput(input.value);
+        input.value = value ?? "";
+      };
+      input.addEventListener('beforeinput', (event) => {
+        const value = input.value + (event.data || "");
+        const normalized = normalizeNumericInput(value);
+        if (normalized === null && value !== "") {
+          event.preventDefault();
+        }
+      });
+      input.addEventListener('input', sanitize);
+      input.addEventListener('blur', sanitize);
+    });
   }
 
   function showToast(msg) {
