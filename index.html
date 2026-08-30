@@ -78,8 +78,14 @@
   .topBar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
   .brandRow { display: flex; align-items: center; gap: 8px; }
   .brandBtn {
-    display: inline-flex; align-items: center; gap: 8px; background: transparent; border: none;
+    display: inline-flex; align-items: center; gap: 10px; background: transparent; border: none;
     padding: 0; cursor: pointer; font: inherit; color: inherit;
+  }
+  .brandLogo {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding-right: 10px;
+    border-right: 1px solid #2A2A2A;
+    line-height: 1;
   }
   .brandText {
     font-family: 'Anton', sans-serif;
@@ -111,7 +117,14 @@
   /* ---------- start screen ---------- */
   .startWrap { display:flex; flex-direction:column; align-items:center; justify-content:center; flex:1; text-align:center; gap:8px; padding:10px 6px; }
   .startIconWrap { width:64px; height:64px; border-radius:50%; background:#161717; border:1px solid #232323; display:flex; align-items:center; justify-content:center; margin-bottom:10px; font-size:26px; }
-  .startTitle { font-family:'Anton', sans-serif; font-size:26px; color:#F5F5F0; text-transform:uppercase; letter-spacing:0.01em; }
+  .startBrandRow {
+    display:flex; align-items:center; justify-content:center; width:100%;
+    padding-bottom:12px; margin-bottom:10px; border-bottom:1px solid #2A2A2A;
+  }
+  .startTitle {
+    font-family:'Anton', sans-serif; font-size:26px; color:#F5F5F0;
+    text-transform:uppercase; letter-spacing:0.01em; margin-top:6px;
+  }
   .startSub { font-size:13px; color:#B9B9B4; max-width:280px; line-height:1.5; }
   .startHint { font-size:11.5px; color:#7A7A75; max-width:260px; line-height:1.5; margin-bottom:12px; }
   .pillBtn { display:flex; align-items:center; gap:8px; background:#39FF6A; color:#0B0D0E; border:none; border-radius:999px; padding:14px 32px; font-size:15px; font-weight:700; font-family:'Inter',sans-serif; }
@@ -129,19 +142,55 @@
   .historyMeta { font-size:12px; color:#8A8A85; }
   .historyList { display:flex; flex-direction:column; gap:10px; margin-top:8px; }
   .historyItem {
-    display:grid; grid-template-columns: minmax(0,1.4fr) auto auto minmax(120px, auto); align-items:center; gap:10px;
+    display:flex; align-items:center; justify-content:space-between; gap:6px; width:100%;
     background:#161717; border:1px solid #232323; border-radius:12px; padding:12px 12px;
     white-space:nowrap;
   }
   .historyName {
-    font-size:13px; color:#F5F5F0; font-weight:700; overflow:hidden; text-overflow:ellipsis;
+    flex:1 1 auto; min-width:0; max-width:100%;
+    font-size:13px; color:#F5F5F0; font-weight:700; line-height:1.35;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
   }
-  .historyDetail { font-size:11px; color:#9A9A94; }
-  .historyTime { font-size:11px; color:#39FF6A; font-weight:700; }
-  .historyActionsInline { display:flex; justify-content:flex-end; gap:8px; }
+  .historyMetaBlock {
+    display:flex; align-items:center; gap:6px; margin-left:auto; margin-right:0; flex-shrink:0;
+  }
+  .historyDetail {
+    font-size:11px; color:#9A9A94; min-width:0; white-space:nowrap; line-height:1.35;
+  }
+  .historyTime {
+    font-size:11px; color:#39FF6A; font-weight:700; min-width:52px; text-align:right; white-space:nowrap;
+  }
+  .historyActionsInline {
+    display:flex; justify-content:flex-end; gap:8px; min-width:0; flex-shrink:0; align-items:center;
+  }
   .historyDetailBtn, .historyDeleteBtn {
     border:none; background:#2A2A2A; color:#F5F5F0; border-radius:999px; padding:7px 10px;
     font-size:11px; font-family:'Inter',sans-serif; cursor:pointer; white-space:nowrap;
+  }
+  @media (max-width: 420px) {
+    .historyItem {
+      grid-template-columns: minmax(0,1fr) auto;
+      white-space:normal;
+      row-gap:8px;
+      align-items:start;
+    }
+    .historyName { grid-column:1 / -1; white-space:normal; }
+    .historyDetail { grid-column:1 / 2; }
+    .historyTime { justify-self:end; }
+    .historyActionsInline { grid-column:1 / -1; justify-content:flex-start; }
+    .historyDetailBtn, .historyDeleteBtn {
+      flex:1 1 0; min-width:0;
+    }
+    .historyModalCard {
+      padding:16px 12px;
+    }
+    .historyModalRow, .historyModalTotal {
+      grid-template-columns:minmax(0, 1fr) auto auto;
+      gap:8px;
+    }
+    .historyCloseBtn {
+      font-size:12px;
+    }
   }
   .historyDetailBtn { background:#1F2E2B; color:#39FF6A; }
   .historyEmpty {
@@ -168,10 +217,21 @@
   .historyModalTitle { font-size:18px; font-weight:800; color:#F5F5F0; margin-bottom:6px; }
   .historyModalMeta { font-size:12px; color:#9A9A94; margin-bottom:12px; }
   .historyModalList { display:flex; flex-direction:column; gap:8px; margin-bottom:12px; }
-  .historyModalRow, .historyModalTotal { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:8px 10px; border-radius:10px; background:#1A1B1B; }
-  .historyModalRow span, .historyModalTotal span { color:#D7D7D1; font-size:12px; }
-  .historyModalRow strong, .historyModalTotal strong { color:#39FF6A; font-size:12px; }
-  .historyModalTotal { margin-top:4px; padding-top:10px; border-top:1px solid #2A2A2A; }
+  .historyModalRow, .historyModalTotal {
+    display:grid; grid-template-columns:minmax(0, 1fr) 72px 52px; align-items:center; gap:10px 12px;
+    padding:8px 10px; border-radius:10px; background:#1A1B1B;
+  }
+  .historyModalRow.sub { grid-template-columns:minmax(0, 1fr) 72px 52px; }
+  .historyModalRow span, .historyModalTotal span, .historyModalRow strong, .historyModalTotal strong { color:#D7D7D1; font-size:12px; }
+  .historyModalRow .historyModalName, .historyModalTotal .historyModalName {
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0;
+  }
+  .historyModalRow .historyModalTime, .historyModalRow .historyModalEffort, .historyModalTotal strong {
+    color:#39FF6A; font-weight:700; text-align:right; justify-self:end; min-width:0;
+  }
+  .historyModalTotal {
+    margin-top:4px; padding-top:10px; border-top:1px solid #2A2A2A; grid-template-columns:minmax(0, 1fr) 72px;
+  }
   .historyCloseBtn {
     margin-top:12px; width:100%; border:none; background:#39FF6A; color:#0B0D0E; border-radius:999px; padding:10px 16px;
     font-size:12.5px; font-weight:700; font-family:'Inter',sans-serif; cursor:pointer;
@@ -813,7 +873,7 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
     STEPS.push({ type: "done" });
 
     BLOCKS = EXO.map((ex) => ({ label: ex.name })).concat([{
-      label: `${(SUPERSET.a.name || "").toUpperCase()} / ${(SUPERSET.b.name || "").toUpperCase()}`
+      label: `${formatDisplayName(SUPERSET.a.name)} / ${formatDisplayName(SUPERSET.b.name)}`
     }]);
 
     BLOCK_OF_STEP = STEPS.map((s) => {
@@ -1271,6 +1331,12 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
     return `${m}:${String(s).padStart(2, "0")}`;
   }
 
+  function formatDisplayName(name) {
+    const trimmed = String(name || "").trim();
+    if (!trimmed) return "";
+    return trimmed.charAt(0).toUpperCase() + trimmed.slice(1).toLowerCase();
+  }
+
   function formatFullDateTime(isoString) {
     if (!isoString) return "—";
     const date = new Date(isoString);
@@ -1334,7 +1400,7 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
     if (!total) return;
     const startedAt = state.sessionStartedAt ? new Date(state.sessionStartedAt) : new Date(Date.now() - total * 1000);
     const details = buildWorkoutRecapDetails();
-    const record = makeHistoryRecord("5 Costauds · séance complète", total, startedAt, details, state.ratings);
+    const record = makeHistoryRecord("5 Costauds", total, startedAt, details, state.ratings);
     HISTORY = [...HISTORY, record];
     persistHistoryState();
   }
@@ -1351,7 +1417,6 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
 
   function deleteHistoryEntry(id) {
     if (!window.confirm("Supprimer cet historique ?")) return;
-    if (!window.confirm("Confirmer la suppression définitive ?")) return;
     HISTORY = HISTORY.filter((item) => item.id !== id);
     persistHistoryState();
     renderHistoryPage();
@@ -1373,12 +1438,12 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
     modal.className = "historyModal";
     const detailRows = details.map((d) => {
       const subRows = Array.isArray(d.sub) && d.sub.length
-        ? d.sub.map((s) => `<div class="historyModalRow sub"><span>↳ ${s.name}</span><strong>${s.effort != null ? `${s.effort}/10` : "—"}</strong></div>`).join("")
+        ? d.sub.map((s) => `<div class="historyModalRow sub"><span class="historyModalName">↳ ${formatDisplayName(s.name)}</span><span class="historyModalTime">—</span><span class="historyModalEffort">${s.effort != null ? `${s.effort}/10` : "—"}</span></div>`).join("")
         : "";
-      const effortCell = d.effort != null ? `<span>${d.effort}/10</span>` : "";
+      const effortCell = d.effort != null ? `<span class="historyModalEffort">${d.effort}/10</span>` : `<span class="historyModalEffort">—</span>`;
       return `
         <div class="historyModalBlock">
-          <div class="historyModalRow"><span>${d.name}</span><strong>${formatHistoryDuration(d.seconds)}</strong>${effortCell ? `<strong>${effortCell}</strong>` : ""}</div>
+          <div class="historyModalRow"><span class="historyModalName">${formatDisplayName(d.name)}</span><span class="historyModalTime">${formatHistoryDuration(d.seconds)}</span>${effortCell}</div>
           ${subRows}
         </div>
       `;
@@ -1410,11 +1475,13 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
           return `
         <div class="historyItem">
           <div class="historyName">${item.name}</div>
-          <div class="historyDetail">${date} ${time}</div>
-          <div class="historyTime">${formatHistoryDuration(item.seconds)}</div>
-          <div class="historyActionsInline">
-            <button class="btn historyDetailBtn" data-id="${item.id}">Détails</button>
-            <button class="btn historyDeleteBtn" data-id="${item.id}">Supprimer</button>
+          <div class="historyMetaBlock">
+            <div class="historyDetail">${date} ${time}</div>
+            <div class="historyTime">${formatHistoryDuration(item.seconds)}</div>
+            <div class="historyActionsInline">
+              <button class="btn historyDetailBtn" data-id="${item.id}">Détails</button>
+              <button class="btn historyDeleteBtn" data-id="${item.id}">Supprimer</button>
+            </div>
           </div>
         </div>`;
         }).join("")
@@ -1653,7 +1720,9 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
       cardEl.innerHTML = `
         <div class="startWrap startWrap--compact">
           <div class="exoStartBlock">
-            <div class="startIconWrap">🏋️</div>
+              <div class="startBrandRow">
+              <div class="startIconWrap">🏋️</div>
+            </div>
             <div class="startTitle">5 Costauds</div>
             <div class="startSub">${EXO.length} exercices + l'enchaînement ${SUPERSET.a.name.toLowerCase()} / ${SUPERSET.b.name.toLowerCase()} · ${totalWork} séries au total</div>
             <button type="button" class="btn pillBtn pyChronoBtn" id="start-btn" style="background:#39FF6A; color:#0B0D0E;">▶ commencer</button>
@@ -1739,7 +1808,7 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
     const totalWork = STEPS.reduce((sum, s) => sum + stepSeriesCount(s), 0);
     el.innerHTML = `
       <button class="brandBtn" id="brand-home-btn" type="button">
-        <span style="color:#39FF6A;font-size:15px;">🏋️</span>
+        <span class="brandLogo" style="color:#39FF6A;font-size:15px;">🏋️</span>
         <span class="brandText">5 Costauds</span>
       </button>
       <div class="topRight">
