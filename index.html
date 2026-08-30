@@ -418,11 +418,14 @@
   .field input { width:100%; box-sizing:border-box; background:#0B0D0E; border:1px solid #2A2A2A; border-radius:8px; color:#F5F5F0; font-size:13.5px; padding:8px 10px; font-family:'Inter',sans-serif; outline:none; }
   .field input:focus { border-color:#39FF6A; }
   .quickNameRow {
-    display:flex; flex-wrap:wrap; gap:8px; margin-top:8px;
+    display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:8px; margin-top:8px;
+    width:100%;
   }
   .quickNameBtn {
     border:1px solid #2A2A2A; background:#101212; color:#F5F5F0; border-radius:999px;
     padding:7px 12px; font-size:11px; font-family:'Inter',sans-serif; cursor:pointer;
+    max-width:100%;
+    text-align:center;
   }
   .quickNameBtn:hover { border-color:#39FF6A; color:#39FF6A; }
   .cfgActions { display:flex; gap:10px; margin-top:6px; margin-bottom:16px; padding-top:6px; }
@@ -520,14 +523,32 @@
           <div class="field"><label>Récup entre manches (s)</label><input type="text" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" min="0" id="ss-rest" /></div>
         </div>
         <div class="fieldRow">
-          <div class="field full"><label>Exercice A — nom</label><input type="text" id="ssA-name" /></div>
+          <div class="field full">
+            <label>Exercice A — nom</label>
+            <input type="text" id="ssA-name" />
+            <div class="quickNameRow">
+              <button type="button" class="quickNameBtn" data-quick-name="Curl haltères">Curl haltères</button>
+              <button type="button" class="quickNameBtn" data-quick-name="Curl 1 bras">Curl 1 bras</button>
+              <button type="button" class="quickNameBtn" data-quick-name="Curl barre">Curl barre</button>
+              <button type="button" class="quickNameBtn" data-quick-name="Curl barre ez">Curl barre ez</button>
+            </div>
+          </div>
         </div>
         <div class="fieldRow">
           <div class="field"><label>Reps A</label><input type="text" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" min="0" id="ssA-reps" /></div>
           <div class="field"><label>Poids total A (kg)</label><input type="text" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" min="0" id="ssA-weight" /></div>
         </div>
         <div class="fieldRow">
-          <div class="field full"><label>Exercice B — nom</label><input type="text" id="ssB-name" /></div>
+          <div class="field full">
+            <label>Exercice B — nom</label>
+            <input type="text" id="ssB-name" />
+            <div class="quickNameRow">
+              <button type="button" class="quickNameBtn" data-quick-name="Extension haltère">Extension haltère</button>
+              <button type="button" class="quickNameBtn" data-quick-name="Extension poulie">Extension poulie</button>
+              <button type="button" class="quickNameBtn" data-quick-name="Triceps au mur">Triceps au mur</button>
+              <button type="button" class="quickNameBtn" data-quick-name="Pompes serrées">Pompes serrées</button>
+            </div>
+          </div>
         </div>
         <div class="fieldRow">
           <div class="field"><label>Reps B</label><input type="text" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" min="0" id="ssB-reps" /></div>
@@ -578,12 +599,20 @@
 };
 
 const EXERCISE_VIDEOS = {
-  "Squats haltères": "https://youtu.be/K2eS6QjK1-w",
+  "Squat barre": "https://youtu.be/yqrE9lGMtlA",
+  "Squat haltères": "https://youtu.be/K2eS6QjK1-w",
+  "Squat bulare": "https://youtu.be/l8JDB4YWtT4",
   "SDT haltères": "https://youtu.be/QzpzuZu9JaA",
+  "SDT sumo": "https://youtu.be/56aX3x7jpvM",
+  "Hip trust": "https://youtu.be/6J-hlEA2hAE",
   "Développé couché haltères": "https://youtu.be/3ckOOdyskXQ",
-  "Rowing bûcheron": "https://youtu.be/zK_rElx-lg8",
+  "Développé couché barre": "https://youtu.be/AP1M8F-g3pA",
+  "Rowing barre": "https://youtu.be/XaDiT7bhzVg",
+  "Rowing haltère": "https://youtu.be/zK_rElx-lg8",
   "Curl haltères": "https://youtu.be/ewaL-R2y7_M",
-  "Extension haltères": "https://youtu.be/-Q8TxvtmN4k"
+  "Extension haltère": "https://youtu.be/-Q8TxvtmN4k",
+  "Triceps pompes": "https://youtu.be/PknN1LLKo6M",
+  "Triceps au mur": "https://youtu.be/tBnbpxUZFow"
 };
 
 let EXO = clone(DEFAULT_EXO);
@@ -2166,8 +2195,38 @@ ${EXERCISE_VIDEOS[step.b.name]
     const firstExoPresetOptions = [
       "Squat barre",
       "Squat haltères",
-      "Squat bulgares",
+      "Squat bulare",
       "Squat"
+    ];
+    const secondExoPresetOptions = [
+      "SDT barre",
+      "SDT haltères",
+      "Hip trust",
+      "SDT sumo",
+      "SDT jambes tendues"
+    ];
+    const thirdExoPresetOptions = [
+      "Développé couché barre",
+      "Développé couché haltères",
+      "Pompes"
+    ];
+    const fourthExoPresetOptions = [
+      "Rowing haltère",
+      "Rowing barre",
+      "Tirage dos",
+      "Pull over"
+    ];
+    const fifthExoPresetOptions = [
+      "Curl haltères",
+      "Curl 1 bras",
+      "Curl barre",
+      "Curl barre ez"
+    ];
+    const sixthExoPresetOptions = [
+      "Extension haltère",
+      "Extension poulie",
+      "Triceps au mur",
+      "Pompes serrées"
     ];
 
     cfgExosEl.innerHTML = EXO.map((ex, idx) => `
@@ -2176,10 +2235,30 @@ ${EXERCISE_VIDEOS[step.b.name]
         <div class="fieldRow">
           <div class="field full">
             <label>Nom</label>
-            <input type="text" data-idx="${idx}" data-key="name" class="exo-input" value="${ex.name}" ${idx === 0 ? 'data-first-exo-name="true"' : ''} />
+            <input type="text" data-idx="${idx}" data-key="name" class="exo-input" value="${ex.name}" ${idx === 0 ? 'data-first-exo-name="true"' : idx === 1 ? 'data-second-exo-name="true"' : idx === 2 ? 'data-third-exo-name="true"' : idx === 3 ? 'data-fourth-exo-name="true"' : idx === 4 ? 'data-fifth-exo-name="true"' : idx === 5 ? 'data-sixth-exo-name="true"' : ''} />
             ${idx === 0 ? `
               <div class="quickNameRow">
                 ${firstExoPresetOptions.map((name) => `<button type="button" class="quickNameBtn" data-quick-name="${name}">${name}</button>`).join("")}
+              </div>
+            ` : idx === 1 ? `
+              <div class="quickNameRow">
+                ${secondExoPresetOptions.map((name) => `<button type="button" class="quickNameBtn" data-quick-name="${name}">${name}</button>`).join("")}
+              </div>
+            ` : idx === 2 ? `
+              <div class="quickNameRow">
+                ${thirdExoPresetOptions.map((name) => `<button type="button" class="quickNameBtn" data-quick-name="${name}">${name}</button>`).join("")}
+              </div>
+            ` : idx === 3 ? `
+              <div class="quickNameRow">
+                ${fourthExoPresetOptions.map((name) => `<button type="button" class="quickNameBtn" data-quick-name="${name}">${name}</button>`).join("")}
+              </div>
+            ` : idx === 4 ? `
+              <div class="quickNameRow">
+                ${fifthExoPresetOptions.map((name) => `<button type="button" class="quickNameBtn" data-quick-name="${name}">${name}</button>`).join("")}
+              </div>
+            ` : idx === 5 ? `
+              <div class="quickNameRow">
+                ${sixthExoPresetOptions.map((name) => `<button type="button" class="quickNameBtn" data-quick-name="${name}">${name}</button>`).join("")}
               </div>
             ` : ""}
           </div>
@@ -2197,7 +2276,8 @@ ${EXERCISE_VIDEOS[step.b.name]
 
     document.querySelectorAll(".quickNameBtn").forEach((btn) => {
       btn.addEventListener("click", () => {
-        const targetInput = document.querySelector('input[data-first-exo-name="true"]');
+        const field = btn.closest(".field");
+        const targetInput = field ? field.querySelector("input[type='text']") : null;
         if (!targetInput) return;
         targetInput.value = btn.dataset.quickName || targetInput.value;
         targetInput.focus();
