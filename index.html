@@ -279,6 +279,7 @@
   .pyLevelNextBtn { flex:1 1 auto; max-width:200px; }
   .pyLevelNextBtn .arrow { font-size:1.3em; line-height:1; display:inline-block; transform:translateY(-1px); }
   .pyChronoBtn { flex:0 0 auto; min-width:auto; }
+  .pyFooterVideo { display:flex; align-items:center; justify-content:center; margin-top:auto; flex:1; padding:12px 0 8px; }
   .pyLevelNextBtn {
     opacity: 0.35;
     background: rgba(57, 255, 106, 0.12);
@@ -612,8 +613,39 @@ const EXERCISE_VIDEOS = {
   "Curl haltères": "https://youtu.be/ewaL-R2y7_M",
   "Extension haltère": "https://youtu.be/-Q8TxvtmN4k",
   "Triceps pompes": "https://youtu.be/PknN1LLKo6M",
-  "Triceps au mur": "https://youtu.be/tBnbpxUZFow"
+  "Triceps au mur": "https://youtu.be/tBnbpxUZFow",
+  "FatBurner 6": "https://youtu.be/LqvjzjpOPvs",
+  "Pyramide": "https://youtu.be/sGEbKQWx37E"
 };
+
+function normalizeExerciseName(name) {
+  return String(name ?? "")
+    .trim()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .toLowerCase()
+    .split(" ")
+    .map((word) => {
+      if (word.length > 3 && word.endsWith("s")) return word.slice(0, -1);
+      return word;
+    })
+    .join(" ")
+    .trim();
+}
+
+function getExerciseVideoUrl(name) {
+  if (name == null) return "";
+  const direct = EXERCISE_VIDEOS[name];
+  if (direct) return direct;
+  const normalized = normalizeExerciseName(name);
+  if (!normalized) return "";
+  for (const [videoName, url] of Object.entries(EXERCISE_VIDEOS)) {
+    if (normalizeExerciseName(videoName) === normalized) return url;
+  }
+  return "";
+}
 
 let EXO = clone(DEFAULT_EXO);
 let SUPERSET = clone(DEFAULT_SUPERSET);
@@ -1251,6 +1283,11 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
       </div>`;
     }).join("");
 
+    const videoUrl = getExerciseVideoUrl(config.title);
+    const videoBtn = videoUrl
+      ? `<div class="pyFooterVideo"><button class="btn pillBtn videoActionBtn" onclick="window.open('${videoUrl}','_blank','noopener,noreferrer')">▶ voir la vidéo</button></div>`
+      : "";
+
     cardEl.innerHTML = `
       <div class="pyWrap">
         <div class="pyHeader">
@@ -1277,6 +1314,7 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
           </div>
         </div>
         <div class="pyExoList">${exosHtml}</div>
+        ${videoBtn}
       </div>`;
 
     document.getElementById("pyramide-chrono-btn").onclick = togglePyramideChrono;
@@ -1939,6 +1977,8 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
     const el = document.getElementById("stepBody");
     const step = STEPS[state.i];
     if (step.type === "work" && step.superset) {
+      const aVideoUrl = getExerciseVideoUrl(step.a.name);
+      const bVideoUrl = getExerciseVideoUrl(step.b.name);
       el.innerHTML = `
         <div class="workWrap">
           <div class="supersetTag">Enchaînement · manche ${step.setNum}/${step.totalSets}</div>
@@ -1952,10 +1992,10 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
   soit ${step.a.weight / 2} kg par haltères si tu en utilises deux
 </div>`}
 
-${EXERCISE_VIDEOS[step.a.name]
+${aVideoUrl
   ? `<div class="videoBtnWrap"><button
        class="btn pillBtn"
-       onclick="window.open('${EXERCISE_VIDEOS[step.a.name]}','_blank','noopener,noreferrer')">
+       onclick="window.open('${aVideoUrl}','_blank','noopener,noreferrer')">
        ▶  voir la vidéo
      </button></div>`
   : ""}
@@ -1970,10 +2010,10 @@ ${EXERCISE_VIDEOS[step.a.name]
   soit ${step.b.weight / 2} kg par haltères si tu en utilises deux
 </div>`}
 
-${EXERCISE_VIDEOS[step.b.name]
+${bVideoUrl
   ? `<div class="videoBtnWrap"><button
        class="btn pillBtn"
-       onclick="window.open('${EXERCISE_VIDEOS[step.b.name]}','_blank','noopener,noreferrer')">
+       onclick="window.open('${bVideoUrl}','_blank','noopener,noreferrer')">
        ▶  voir la vidéo
      </button></div>`
   : ""}
@@ -1989,6 +2029,7 @@ ${EXERCISE_VIDEOS[step.b.name]
       if (state.running) document.getElementById("done-set-btn").onclick = next;
       document.getElementById("pause-btn").onclick = togglePause;
     } else if (step.type === "work") {
+      const currentVideoUrl = getExerciseVideoUrl(step.name);
       el.innerHTML = `
         <div class="workWrap">
           <div class="exoName">${step.name}</div>
@@ -1999,8 +2040,8 @@ ${EXERCISE_VIDEOS[step.b.name]
           </div>
           ${step.name === "Extension haltères" ? "" : `<div class="weightHint">soit ${step.weight / 2} kg par haltères si tu en utilises deux</div>`}
           <div class="actionStack">
-            ${EXERCISE_VIDEOS[step.name]
-  ? `<button class="btn pillBtn videoActionBtn" onclick="window.open('${EXERCISE_VIDEOS[step.name]}','_blank')">▶ voir la vidéo</button>`
+            ${currentVideoUrl
+  ? `<button class="btn pillBtn videoActionBtn" onclick="window.open('${currentVideoUrl}','_blank')">▶ voir la vidéo</button>`
   : ""}
             <button class="btn pillBtn" id="done-set-btn" ${state.running ? "" : "disabled"} style="background:${state.running ? "#39FF6A" : "rgba(57, 255, 106, 0.12)"}; color:${state.running ? "#0B0D0E" : "rgba(245, 245, 240, 0.8)"}; border:${state.running ? "none" : "1px solid rgba(57, 255, 106, 0.18)"}; cursor:${state.running ? "pointer" : "default"}; pointer-events:${state.running ? "auto" : "none"}; opacity:${state.running ? "1" : "0.35"};">
               ✓ série terminée
