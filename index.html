@@ -417,6 +417,14 @@
   .field label { font-size:9.5px; color:#8A8A85; text-transform:uppercase; letter-spacing:0.04em; font-weight:600; }
   .field input { width:100%; box-sizing:border-box; background:#0B0D0E; border:1px solid #2A2A2A; border-radius:8px; color:#F5F5F0; font-size:13.5px; padding:8px 10px; font-family:'Inter',sans-serif; outline:none; }
   .field input:focus { border-color:#39FF6A; }
+  .quickNameRow {
+    display:flex; flex-wrap:wrap; gap:8px; margin-top:8px;
+  }
+  .quickNameBtn {
+    border:1px solid #2A2A2A; background:#101212; color:#F5F5F0; border-radius:999px;
+    padding:7px 12px; font-size:11px; font-family:'Inter',sans-serif; cursor:pointer;
+  }
+  .quickNameBtn:hover { border-color:#39FF6A; color:#39FF6A; }
   .cfgActions { display:flex; gap:10px; margin-top:6px; margin-bottom:16px; padding-top:6px; }
   .primaryBtn { flex:1; background:#39FF6A; color:#0B0D0E; border:none; border-radius:999px; padding:13px; font-size:13.5px; font-weight:700; font-family:'Inter',sans-serif; text-transform:uppercase; letter-spacing:0.03em; cursor:pointer; }
   .ghostBtn { background:transparent; border:1px solid #2A2A2A; color:#B9B9B4; border-radius:999px; padding:13px 16px; font-size:13px; font-family:'Inter',sans-serif; cursor:pointer; }
@@ -2155,11 +2163,26 @@ ${EXERCISE_VIDEOS[step.b.name]
   const cfgExosEl = document.getElementById("cfg-exos");
 
   function fillConfigForm() {
+    const firstExoPresetOptions = [
+      "Squat barre",
+      "Squat haltères",
+      "Squat bulgares",
+      "Squat"
+    ];
+
     cfgExosEl.innerHTML = EXO.map((ex, idx) => `
       <div class="exoCard">
         <div class="exoCardTitle">Exercice ${idx + 1}</div>
         <div class="fieldRow">
-          <div class="field full"><label>Nom</label><input type="text" data-idx="${idx}" data-key="name" class="exo-input" value="${ex.name}" /></div>
+          <div class="field full">
+            <label>Nom</label>
+            <input type="text" data-idx="${idx}" data-key="name" class="exo-input" value="${ex.name}" ${idx === 0 ? 'data-first-exo-name="true"' : ''} />
+            ${idx === 0 ? `
+              <div class="quickNameRow">
+                ${firstExoPresetOptions.map((name) => `<button type="button" class="quickNameBtn" data-quick-name="${name}">${name}</button>`).join("")}
+              </div>
+            ` : ""}
+          </div>
         </div>
         <div class="fieldRow">
           <div class="field"><label>Séries</label><input type="text" inputmode="decimal" pattern="[0-9]*[,]?[0-9]*" min="1" data-idx="${idx}" data-key="sets" class="exo-input" value="${ex.sets}" /></div>
@@ -2171,6 +2194,15 @@ ${EXERCISE_VIDEOS[step.b.name]
         </div>
       </div>
     `).join("");
+
+    document.querySelectorAll(".quickNameBtn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const targetInput = document.querySelector('input[data-first-exo-name="true"]');
+        if (!targetInput) return;
+        targetInput.value = btn.dataset.quickName || targetInput.value;
+        targetInput.focus();
+      });
+    });
 
     document.getElementById("ss-rounds").value = SUPERSET.rounds;
     document.getElementById("ss-rest").value = SUPERSET.rest;
