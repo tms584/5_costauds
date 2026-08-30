@@ -14,6 +14,8 @@
     font-family: 'Inter', sans-serif;
     min-height: 100vh;
     overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
     width: 100%;
   }
   .app {
@@ -25,6 +27,7 @@
     display: flex;
     flex-direction: column;
     overflow-x: hidden;
+    overflow-y: visible;
   }
   .tabs {
     display: grid;
@@ -42,11 +45,11 @@
     background: transparent;
     color: #8A8A85;
     font-family: 'Inter', sans-serif;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 700;
-    letter-spacing: 0.03em;
+    letter-spacing: 0.02em;
     text-transform: uppercase;
-    padding: 10px 8px;
+    padding: 9px 6px;
     border-radius: 999px;
     cursor: pointer;
     transition: background .15s ease, color .15s ease;
@@ -169,6 +172,7 @@
   }
   @media (max-width: 420px) {
     .historyItem {
+      display:grid;
       grid-template-columns: minmax(0,1fr) auto;
       white-space:normal;
       row-gap:8px;
@@ -181,7 +185,15 @@
     .historyDetailBtn, .historyDeleteBtn {
       flex:1 1 0; min-width:0;
     }
+    .historyModal {
+      align-items:flex-start;
+      overflow-y:auto;
+      padding:16px 12px;
+    }
     .historyModalCard {
+      width:min(420px, 100%);
+      max-height:85vh;
+      overflow-y:auto;
       padding:16px 12px;
     }
     .historyModalRow, .historyModalTotal {
@@ -208,11 +220,11 @@
 
   .historyModal {
     position:fixed; inset:0; background:rgba(11,13,14,0.72); display:flex; align-items:center; justify-content:center;
-    padding:16px; z-index:200;
+    padding:16px; z-index:200; overflow-y:auto;
   }
   .historyModalCard {
     width:min(420px, 100%); background:#151718; border:1px solid #2A2A2A; border-radius:18px; padding:18px 16px;
-    box-shadow:0 14px 30px rgba(0,0,0,0.35);
+    box-shadow:0 14px 30px rgba(0,0,0,0.35); max-height:90vh; overflow-y:auto;
   }
   .historyModalTitle { font-size:18px; font-weight:800; color:#F5F5F0; margin-bottom:6px; }
   .historyModalMeta { font-size:12px; color:#9A9A94; margin-bottom:12px; }
@@ -488,22 +500,22 @@
       <div class="exoCard">
         <div class="exoCardTitle">Enchaînement (superset)</div>
         <div class="fieldRow">
-          <div class="field"><label>Manches</label><input type="number" min="1" id="ss-rounds" /></div>
-          <div class="field"><label>Récup entre manches (s)</label><input type="number" min="0" id="ss-rest" /></div>
+          <div class="field"><label>Manches</label><input type="text" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" min="1" id="ss-rounds" /></div>
+          <div class="field"><label>Récup entre manches (s)</label><input type="text" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" min="0" id="ss-rest" /></div>
         </div>
         <div class="fieldRow">
           <div class="field full"><label>Exercice A — nom</label><input type="text" id="ssA-name" /></div>
         </div>
         <div class="fieldRow">
-          <div class="field"><label>Reps A</label><input type="number" min="0" id="ssA-reps" /></div>
-          <div class="field"><label>Poids total A (kg)</label><input type="number" min="0" id="ssA-weight" /></div>
+          <div class="field"><label>Reps A</label><input type="text" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" min="0" id="ssA-reps" /></div>
+          <div class="field"><label>Poids total A (kg)</label><input type="text" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" min="0" id="ssA-weight" /></div>
         </div>
         <div class="fieldRow">
           <div class="field full"><label>Exercice B — nom</label><input type="text" id="ssB-name" /></div>
         </div>
         <div class="fieldRow">
-          <div class="field"><label>Reps B</label><input type="number" min="0" id="ssB-reps" /></div>
-          <div class="field"><label>Poids total B (kg)</label><input type="number" min="0" id="ssB-weight" /></div>
+          <div class="field"><label>Reps B</label><input type="text" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" min="0" id="ssB-reps" /></div>
+          <div class="field"><label>Poids total B (kg)</label><input type="text" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" min="0" id="ssB-weight" /></div>
         </div>
       </div>
       <div class="cfgActions">
@@ -562,6 +574,18 @@ let EXO = clone(DEFAULT_EXO);
 let SUPERSET = clone(DEFAULT_SUPERSET);
 
   function clone(o) { return JSON.parse(JSON.stringify(o)); }
+  function normalizeNumericInput(value) {
+    if (value === null || value === undefined) return null;
+    const normalized = String(value).trim().replace(/,/g, ".");
+    if (!normalized || normalized === ".") return null;
+    return normalized;
+  }
+  function safeNumber(value, fallback = 0) {
+    const normalized = normalizeNumericInput(value);
+    if (normalized === null) return fallback;
+    const parsed = Number(normalized);
+    return Number.isFinite(parsed) ? parsed : fallback;
+  }
   function formatTime(s) {
     s = Math.max(0, Math.round(s));
     const m = Math.floor(s / 60);
@@ -1127,7 +1151,7 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
     }
     const total = formatChrono(pyramideChrono.seconds);
     const rows = currentPyramidConfig.levels.map((lvl,i)=>`<div class="recapRow ${i%2?'stripe':''}"><span>Niveau ${lvl}</span><span></span><span class="recapValue">${formatChrono(pyramideChrono.levelTimes[i]||0)}</span></div>`).join('');
-    cardEl.innerHTML = `<div class="doneWrap"><div class="doneTitle">${currentPyramidConfig.doneTitle}</div><div class="recapBox"><div class="recapTotalRow"><div class="recapTotalLabel">Temps total</div><div class="recapTotalValue">${total}</div></div><div class="recapDivider"></div><div class="recapTable">${rows}</div></div><button class="btn restartBtn" id="pyramide-restart">↺ Recommencer</button></div>`;
+    cardEl.innerHTML = `<div class="doneWrap"><div class="doneTitle">${currentPyramidConfig.doneTitle}</div><div class="recapBox"><div class="recapTotalRow"><div class="recapTotalLabel">Temps total</div><div class="recapTotalValue">${total}</div></div><div class="recapDivider"></div><div class="recapTable">${rows}</div></div><button class="btn restartBtn" id="pyramide-restart">💾 Sauvegarder et quitter</button></div>`;
     document.getElementById('pyramide-restart').onclick = () => {
       goToMainMenu();
     };
@@ -2052,7 +2076,7 @@ ${EXERCISE_VIDEOS[step.b.name]
             </div>
             <div class="kcalNote" id="kcal-note" style="display:none;">estimation à partir du temps de travail actif et de récupération, pas une mesure exacte</div>
           </div>
-          <button class="btn restartBtn" id="restart-btn">↺ recommencer</button>
+          <button class="btn restartBtn" id="restart-btn">💾 Sauvegarder et quitter</button>
         </div>`;
       document.getElementById("restart-btn").onclick = handleRestart;
       document.getElementById(kcalBoxId).addEventListener("input", (e) => {
@@ -2115,12 +2139,12 @@ ${EXERCISE_VIDEOS[step.b.name]
           <div class="field full"><label>Nom</label><input type="text" data-idx="${idx}" data-key="name" class="exo-input" value="${ex.name}" /></div>
         </div>
         <div class="fieldRow">
-          <div class="field"><label>Séries</label><input type="number" min="1" data-idx="${idx}" data-key="sets" class="exo-input" value="${ex.sets}" /></div>
-          <div class="field"><label>Répétitions</label><input type="number" min="0" data-idx="${idx}" data-key="reps" class="exo-input" value="${ex.reps}" /></div>
+          <div class="field"><label>Séries</label><input type="text" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" min="1" data-idx="${idx}" data-key="sets" class="exo-input" value="${ex.sets}" /></div>
+          <div class="field"><label>Répétitions</label><input type="text" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" min="0" data-idx="${idx}" data-key="reps" class="exo-input" value="${ex.reps}" /></div>
         </div>
         <div class="fieldRow">
-          <div class="field"><label>Poids total (kg)</label><input type="number" min="0" step="0.5" data-idx="${idx}" data-key="weight" class="exo-input" value="${ex.weight}" /></div>
-          <div class="field"><label>Récup' (s)</label><input type="number" min="0" data-idx="${idx}" data-key="rest" class="exo-input" value="${ex.rest}" /></div>
+          <div class="field"><label>Poids total (kg)</label><input type="text" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" min="0" step="0.5" data-idx="${idx}" data-key="weight" class="exo-input" value="${ex.weight}" /></div>
+          <div class="field"><label>Récup' (s)</label><input type="text" inputmode="decimal" pattern="[0-9]*[.,]?[0-9]*" min="0" data-idx="${idx}" data-key="rest" class="exo-input" value="${ex.rest}" /></div>
         </div>
       </div>
     `).join("");
@@ -2149,19 +2173,23 @@ ${EXERCISE_VIDEOS[step.b.name]
       if (key === "name") {
         EXO[idx].name = input.value.trim() || EXO[idx].name;
       } else {
-        const v = parseFloat(input.value);
-        EXO[idx][key] = isNaN(v) ? EXO[idx][key] : v;
+        const v = safeNumber(input.value, NaN);
+        EXO[idx][key] = Number.isFinite(v) ? v : EXO[idx][key];
       }
     });
-    SUPERSET.rounds = parseInt(document.getElementById("ss-rounds").value, 10) || SUPERSET.rounds;
-    SUPERSET.rest = parseFloat(document.getElementById("ss-rest").value);
-    if (isNaN(SUPERSET.rest)) SUPERSET.rest = DEFAULT_SUPERSET.rest;
+    SUPERSET.rounds = parseInt(normalizeNumericInput(document.getElementById("ss-rounds").value) || String(SUPERSET.rounds), 10) || SUPERSET.rounds;
+    SUPERSET.rest = safeNumber(document.getElementById("ss-rest").value, NaN);
+    if (!Number.isFinite(SUPERSET.rest)) SUPERSET.rest = DEFAULT_SUPERSET.rest;
     SUPERSET.a.name = document.getElementById("ssA-name").value.trim() || SUPERSET.a.name;
-    SUPERSET.a.reps = parseFloat(document.getElementById("ssA-reps").value) || SUPERSET.a.reps;
-    SUPERSET.a.weight = parseFloat(document.getElementById("ssA-weight").value) || SUPERSET.a.weight;
+    SUPERSET.a.reps = safeNumber(document.getElementById("ssA-reps").value, NaN);
+    if (!Number.isFinite(SUPERSET.a.reps)) SUPERSET.a.reps = SUPERSET.a.reps;
+    SUPERSET.a.weight = safeNumber(document.getElementById("ssA-weight").value, NaN);
+    if (!Number.isFinite(SUPERSET.a.weight)) SUPERSET.a.weight = SUPERSET.a.weight;
     SUPERSET.b.name = document.getElementById("ssB-name").value.trim() || SUPERSET.b.name;
-    SUPERSET.b.reps = parseFloat(document.getElementById("ssB-reps").value) || SUPERSET.b.reps;
-    SUPERSET.b.weight = parseFloat(document.getElementById("ssB-weight").value) || SUPERSET.b.weight;
+    SUPERSET.b.reps = safeNumber(document.getElementById("ssB-reps").value, NaN);
+    if (!Number.isFinite(SUPERSET.b.reps)) SUPERSET.b.reps = SUPERSET.b.reps;
+    SUPERSET.b.weight = safeNumber(document.getElementById("ssB-weight").value, NaN);
+    if (!Number.isFinite(SUPERSET.b.weight)) SUPERSET.b.weight = SUPERSET.b.weight;
 
     resetSession();
     saveToLocalStorage();
