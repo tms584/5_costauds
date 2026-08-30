@@ -656,6 +656,9 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
     let normalized = String(value).trim().replace(/\s+/g, "");
     if (!normalized) return null;
 
+    if (normalized === ".") return "0,";
+    if (normalized === ",") return "0,";
+
     normalized = normalized.replace(/\./g, ",");
     normalized = normalized.replace(/,+/g, ",");
 
@@ -666,9 +669,9 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
       normalized = `${whole},${fraction}`;
     }
 
-    if (normalized === ",") return null;
-    if (normalized.startsWith(",")) normalized = normalized.slice(1);
-    if (normalized.endsWith(",")) normalized = normalized.slice(0, -1);
+    if (normalized.startsWith(",")) normalized = `0${normalized}`;
+    if (normalized.startsWith(".")) normalized = `0${normalized.replace(".", ",")}`;
+    if (normalized.endsWith(",")) return normalized;
     if (!normalized || normalized === ".") return null;
     return normalized;
   }
@@ -2340,9 +2343,9 @@ ${bVideoUrl
         input.value = value ?? "";
       };
       input.addEventListener('beforeinput', (event) => {
-        const value = input.value + (event.data || "");
-        const normalized = normalizeNumericInput(value);
-        if (normalized === null && value !== "") {
+        const nextValue = input.value + (event.data || "");
+        const normalized = normalizeNumericInput(nextValue);
+        if (normalized === null && nextValue !== "") {
           event.preventDefault();
         }
       });
