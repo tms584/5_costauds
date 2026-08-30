@@ -615,7 +615,7 @@ const EXERCISE_VIDEOS = {
   "Triceps pompes": "https://youtu.be/PknN1LLKo6M",
   "Triceps au mur": "https://youtu.be/tBnbpxUZFow",
   "FatBurner 6": "https://youtu.be/LqvjzjpOPvs",
-  "Pyramide": "https://youtu.be/sGEbKQWx37E"
+  "Pyramide 10": "https://youtu.be/sGEbKQWx37E"
 };
 
 function normalizeExerciseName(name) {
@@ -645,6 +645,15 @@ function getExerciseVideoUrl(name) {
     if (normalizeExerciseName(videoName) === normalized) return url;
   }
   return "";
+}
+
+function openVideo(url) {
+  if (!url) return;
+  if (/iPhone|iPad|iPod/i.test(navigator.userAgent) && (window.matchMedia('(display-mode: standalone)').matches || !!window.navigator.standalone)) {
+    window.location.href = url;
+    return;
+  }
+  window.open(url, '_blank', 'noopener,noreferrer');
 }
 
 let EXO = clone(DEFAULT_EXO);
@@ -1134,8 +1143,8 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
   let currentPyramidConfig = {
     levels: PYRAMIDE_LEVELS,
     exos: [],
-    title: "Pyramide",
-    doneTitle: "Pyramide terminée",
+    title: "Pyramide 10",
+    doneTitle: "Pyramide 10 terminée",
     subtitle: "5 exercices en pyramide du niveau 1 au 10"
   };
   pyramideChrono.levelTimes = Array(PYRAMIDE_LEVELS.length).fill(0);
@@ -1288,7 +1297,7 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
 
     const videoUrl = getExerciseVideoUrl(config.title);
     const videoBtn = videoUrl
-      ? `<div class="pyFooterVideo"><button class="btn pillBtn videoActionBtn" onclick="window.open('${videoUrl}','_blank','noopener,noreferrer')">▶ voir la vidéo</button></div>`
+      ? `<div class="pyFooterVideo"><a class="btn pillBtn videoActionBtn" href="${videoUrl}" target="_blank" rel="noopener noreferrer">▶ voir la vidéo</a></div>`
       : "";
 
     cardEl.innerHTML = `
@@ -1332,7 +1341,7 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
       subtitle,
       levels: PYRAMIDE_LEVELS,
       exos: PYRAMIDE_EXOS,
-      doneTitle: "Pyramide terminée"
+      doneTitle: "Pyramide 10 terminée"
     });
   }
 
@@ -1853,7 +1862,7 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
             <button type="button" class="btn pillBtn pyChronoBtn" id="start-btn" style="background:#39FF6A; color:#0B0D0E;">▶ commencer</button>
           </div>
           <div class="exoStartBlock">
-            <div class="startTitle">Pyramide</div>
+            <div class="startTitle">Pyramide 10</div>
             <div class="startSub">5 exercices en pyramide du niveau 1 au 10</div>
             <button type="button" class="btn pillBtn" id="start-pyramide-btn">▶ commencer</button>
           </div>
@@ -1872,7 +1881,7 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
       document.getElementById("start-pyramide-btn").onclick = (event) => {
         event.preventDefault();
         event.stopPropagation();
-        renderPyramide("Pyramide", "5 exercices en pyramide du niveau 1 au 10");
+        renderPyramide("Pyramide 10", "5 exercices en pyramide du niveau 1 au 10");
       };
       document.getElementById("start-fatburner6-btn").onclick = (event) => {
         event.preventDefault();
@@ -1996,11 +2005,13 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
 </div>`}
 
 ${aVideoUrl
-  ? `<div class="videoBtnWrap"><button
+  ? `<div class="videoBtnWrap"><a
        class="btn pillBtn"
-       onclick="window.open('${aVideoUrl}','_blank','noopener,noreferrer')">
+       href="${aVideoUrl}"
+       target="_blank"
+       rel="noopener noreferrer">
        ▶  voir la vidéo
-     </button></div>`
+     </a></div>`
   : ""}
           <div class="supersetHint">Enchaîne directement avec ${step.b.name}, sans pause</div>
           <div class="exoName" style="margin-bottom:14px;">${step.b.name}</div>
@@ -2014,11 +2025,13 @@ ${aVideoUrl
 </div>`}
 
 ${bVideoUrl
-  ? `<div class="videoBtnWrap"><button
+  ? `<div class="videoBtnWrap"><a
        class="btn pillBtn"
-       onclick="window.open('${bVideoUrl}','_blank','noopener,noreferrer')">
+       href="${bVideoUrl}"
+       target="_blank"
+       rel="noopener noreferrer">
        ▶  voir la vidéo
-     </button></div>`
+     </a></div>`
   : ""}
           <div class="supersetActionStack">
             <button class="btn pillBtn" id="done-set-btn" ${state.running ? "" : "disabled"} style="background:${state.running ? "#39FF6A" : "rgba(57, 255, 106, 0.12)"}; color:${state.running ? "#0B0D0E" : "rgba(245, 245, 240, 0.8)"}; border:${state.running ? "none" : "1px solid rgba(57, 255, 106, 0.18)"}; cursor:${state.running ? "pointer" : "default"}; pointer-events:${state.running ? "auto" : "none"}; opacity:${state.running ? "1" : "0.35"};">
@@ -2044,7 +2057,7 @@ ${bVideoUrl
           ${step.name === "Extension haltères" ? "" : `<div class="weightHint">soit ${step.weight / 2} kg par haltères si tu en utilises deux</div>`}
           <div class="actionStack">
             ${currentVideoUrl
-  ? `<button class="btn pillBtn videoActionBtn" onclick="window.open('${currentVideoUrl}','_blank')">▶ voir la vidéo</button>`
+  ? `<a class="btn pillBtn videoActionBtn" href="${currentVideoUrl}" target="_blank" rel="noopener noreferrer">▶ voir la vidéo</a>`
   : ""}
             <button class="btn pillBtn" id="done-set-btn" ${state.running ? "" : "disabled"} style="background:${state.running ? "#39FF6A" : "rgba(57, 255, 106, 0.12)"}; color:${state.running ? "#0B0D0E" : "rgba(245, 245, 240, 0.8)"}; border:${state.running ? "none" : "1px solid rgba(57, 255, 106, 0.18)"}; cursor:${state.running ? "pointer" : "default"}; pointer-events:${state.running ? "auto" : "none"}; opacity:${state.running ? "1" : "0.35"};">
               ✓ série terminée
