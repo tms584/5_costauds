@@ -301,6 +301,7 @@
   .pyExoBody { display:flex; flex-direction:column; gap:4px; min-width:0; }
   .pyExoName { font-size:14px; font-weight:700; color:#39FF6A; text-transform:uppercase; letter-spacing:0.02em; }
   .pyExoDesc { font-size:12px; line-height:1.45; color:#B9B9B4; white-space: pre-line; display:block; }
+.pyExoDesc.hiddenDesc{display:none;}
   .pyEndBtn { align-self:center; background:#F5F5F0; }
 
   /* ---------- work screen ---------- */
@@ -1290,7 +1291,7 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
         ${imgsHtml}
         <div class="pyExoBody">
           <div class="pyExoName">#${ex.num} ${ex.name}</div>
-          <div class="pyExoDesc">${ex.desc}</div>
+          <div class="pyExoDesc hiddenDesc">${ex.desc}</div>
         </div>
       </div>`;
     }).join("");
@@ -1325,13 +1326,14 @@ let SUPERSET = clone(DEFAULT_SUPERSET);
             <button class="btn pillBtn pyChronoBtn" id="pyramide-chrono-btn" style="background:${pyramideChrono.running ? "#FF3B3B" : "#39FF6A"}; color:${pyramideChrono.running ? "#F5F5F0" : "#0B0D0E"};">${pyramideChrono.running ? "⏸ pause séance" : (pyramideChrono.seconds > 0 ? "▶ reprendre" : "▶ démarrer")}</button>
           </div>
         </div>
-        <div class="pyExoList">${exosHtml}</div>
+        <div style="text-align:center;margin-bottom:12px;"><button class="btn infoBtn" id="show-exo-details">ⓘ Détails des exercices</button></div><div class="pyExoList">${exosHtml}</div>
         ${videoBtn}
       </div>`;
 
     document.getElementById("pyramide-chrono-btn").onclick = togglePyramideChrono;
     document.getElementById("pyramide-level-next").onclick = nextPyramideLevel;
     document.getElementById("pyramide-level-prev").onclick = prevPyramideLevel;
+    const detailsBtn=document.getElementById("show-exo-details"); if(detailsBtn){let v=false;detailsBtn.onclick=()=>{v=!v;document.querySelectorAll(".pyExoDesc").forEach(e=>e.classList.toggle("hiddenDesc",!v));detailsBtn.textContent=v?"ⓘ Masquer les détails":"ⓘ Détails des exercices";};}
     updateLevelDisplay();
   }
 
@@ -2412,6 +2414,9 @@ ${bVideoUrl
     fillConfigForm();
   })();
 })();
+</script>
+<script>
+document.addEventListener("DOMContentLoaded",function(){var b=document.querySelector('.tab-btn[data-tab="seance"]');if(b){b.textContent="🏠 Accueil";b.style.background="#39FF6A";b.style.color="#0B0D0E";}});
 </script>
 </body>
 </html>
